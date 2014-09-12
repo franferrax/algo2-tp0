@@ -1,0 +1,5 @@
+# Directorio de binarios
+bin/
+
+# Archivo de intercambio de vim
+*.swp

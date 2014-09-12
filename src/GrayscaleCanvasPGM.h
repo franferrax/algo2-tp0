@@ -13,6 +13,7 @@ typedef unsigned char pixel_t;
 #define MAX_COMMENT_LENGTH 65536
 
 
+
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
 /*|//////////////////////////| GrayscaleCanvasPGM |\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
@@ -24,38 +25,40 @@ class GrayscaleCanvasPGM
     pixel_t             ColorDepth;  // Profundidad del color (niveles)
     pixel_t             **canvas;    // Lienzo, matriz de imagen
 
+    // Utilidades internas
+    static void ignore_comments (istream &);       // Ignorar comentarios
+    static pixel_t** new_canvas (size_t, size_t);  // Memoria para el lienzo
+    void canvasDestroy (); // Destrucción del lienzo
+
 
 public:
-    // 1) Constructor
-    GrayscaleCanvasPGM (size_t, size_t, pixel_t);
+    // 1) Constructor (con sus argumentos por defecto)
+    GrayscaleCanvasPGM (size_t w=1, size_t h=1, pixel_t d=MAX_COLOR_DEPTH);
 
-    // 2) Constructor por defecto
-    GrayscaleCanvasPGM () : GrayscaleCanvasPGM (1, 1, MAX_COLOR_DEPTH) {}
-
-    // 3) Constructor por copia
+    // 2) Constructor por copia
     GrayscaleCanvasPGM (const GrayscaleCanvasPGM &);
 
-    // 4) Destructor
-    ~ GrayscaleCanvasPGM ();
+    // 3) Destructor
+    ~ GrayscaleCanvasPGM () { canvasDestroy (); };
 
-    // 5) Indexación del lienzo (l-value y r-value: c[y][x])
-    pixel_t* & operator[] (size_t) const;
+    // 4) Indexación del lienzo (l-value y r-value: c[y][x])
+    pixel_t* operator[] (size_t) const;
 
-    // 6-8) Obtención de ancho, alto, profundidad de color
-    size_t  getWidth ();
-    size_t  getHeight ();
-    pixel_t getColorDepth ();
+    // 5-7) Obtención de ancho, alto, profundidad de color
+    size_t  getWidth () const;
+    size_t  getHeight () const;
+    pixel_t getColorDepth () const;
 
-    // 9) Cambio de profundidad de color
+    // 8) Cambio de profundidad de color
     void setColorDepth (pixel_t);
 
-    // 10) Cambio de tamaño de imagen 
+    // 9) Cambio de tamaño de imagen
     void resize (size_t, size_t);
 
-    // 11) Impresión en flujo/archivo/stdin
+    // 10) Impresión en flujo/archivo/stdin
     friend ostream & operator<< (ostream &, const GrayscaleCanvasPGM &);
 
-    // 12) Carga desde flujo/archivo/stdin
+    // 11) Carga desde flujo/archivo/stdin
     friend istream & operator>> (istream &, GrayscaleCanvasPGM &);
 };
 

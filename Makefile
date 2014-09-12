@@ -7,7 +7,7 @@ CC = g++
 # Flags para linkeo:
 LFLAGS = -pedantic -Wall
 # Flags para compilación:
-CFLAGS = -std=c++11 -pedantic -Wall -O3
+CFLAGS = -ansi -pedantic-errors -Wall -O3
 # Nombre de salida del proyecto:
 OUT = tp0
 # Directorio de archivos fuente:

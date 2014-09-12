@@ -13,7 +13,10 @@ int main() // Main de pruebas, ejecutar con: bin/tp0
     GrayscaleCanvasPGM image;
 
     if ( !(infile >> image) )
+    {
+        cerr << "Imagen PGM con formato inválido" << endl;
         return 1;
+    }
 
     infile.close();
 
