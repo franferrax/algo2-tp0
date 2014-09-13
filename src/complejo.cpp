@@ -83,3 +83,8 @@ const complejo complejo::operator+(const double f){
 complejo complejo::expo(const complejo &c){
     return complejo(exp(c.x)*cos(c.y),exp(c.x)*sin(c.y));
 }
+
+//z
+complejo complejo::expo(const complejo &c){
+    return complejo(c.x,c.y);
+}

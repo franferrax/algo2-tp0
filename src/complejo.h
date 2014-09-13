@@ -39,7 +39,9 @@ public:
 
     const complejo operator+(const double);
 
-    static complejo expo(const complejo &); //e^z
+    static complejo expo(const complejo &); //f(z) = e^z
+    
+    static complejo identidad(const complejo &); //f(z) = z
 
 };
 
