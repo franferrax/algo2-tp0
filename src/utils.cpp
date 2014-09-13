@@ -82,3 +82,10 @@ void validateCommandLineArguments(int argc, char** argv, string &input, string &
     if(function == "") function = "z";
 }
 
+complejo getComplexFromIndex(int i, int j, int high, int width){
+    
+    if(i<0 || j<0 || high<0 || width<0 || i>=high || j>=width) return complejo();
+    
+    return complejo((2*j+1)/width - 1,1- (2*i+1)/high);
+    
+}

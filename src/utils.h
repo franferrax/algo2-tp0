@@ -11,10 +11,13 @@
 #include <string>
 #include <cstring>
 #include <iostream>
+#include "complejo.h"
 
 using namespace std;
 
 void validateCommandLineArguments(int , char** , string &, string &, string &);
+
+complejo getComplexFromIndex(int , int , int , int );
 
 #endif	/* UTILS_H */
 
