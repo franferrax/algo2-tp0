@@ -85,6 +85,6 @@ complejo complejo::expo(const complejo &c){
 }
 
 //z
-complejo complejo::expo(const complejo &c){
+complejo complejo::identidad(const complejo &c){
     return complejo(c.x,c.y);
 }
