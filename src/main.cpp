@@ -2,10 +2,23 @@
 #include <fstream>
 #include "GrayscaleCanvasPGM.h"
 #include "complejo.h"
+#include "utils.h"
 
-
-int main() // Main de pruebas, ejecutar con: bin/tp0
+int main(int argc, char** argv) // Main de pruebas, ejecutar con: bin/tp0
 {
+    
+    string in = "";
+    string out = "";
+    string function = "";
+    
+    cout << "/*** Probando linea de comandos ***/"<<endl;
+    validateCommandLineArguments(argc,argv,in,out,function);
+    
+    cout<<"El archivo de entrada es "<< in<<endl;
+    cout<<"El archivo de salida es "<< out<<endl;
+    cout<<"La funcion de entrada es "<< function<<endl;
+    
+    cout << "/*** Probando GrayscaleCanvasPGM ***/"<<endl;
     // Archivo de entrada
     ifstream infile;
     infile.open("test/pre.pgm");
@@ -39,6 +52,7 @@ int main() // Main de pruebas, ejecutar con: bin/tp0
 
     outfile.close();
     
+    cout << "/*** Probando complejos ***/"<<endl;
     complejo z(5, -2);
     cout << complejo::expo(z);
 

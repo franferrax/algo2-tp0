@@ -26,6 +26,7 @@ INSTALL_PATH = /usr/bin
     # -------------------------- Códigos objeto -------------------------- #
 OBJECTS = $(BIN_PATH)/GrayscaleCanvasPGM.o \
           $(BIN_PATH)/complejo.o           \
+	  $(BIN_PATH)/utils.o		    \
           $(BIN_PATH)/main.o
 
 
@@ -41,9 +42,14 @@ $(BIN_PATH)/complejo.o:           $(SRC_PATH)/complejo.cpp           \
                                   $(SRC_PATH)/complejo.h             \
                                   $(BIN_PATH)
 
+$(BIN_PATH)/utils.o:		    $(SRC_PATH)/utils.cpp           \
+                                  $(SRC_PATH)/utils.h             \
+                                  $(BIN_PATH)
+
 $(BIN_PATH)/main.o:               $(SRC_PATH)/main.cpp               \
                                   $(SRC_PATH)/GrayscaleCanvasPGM.h   \
                                   $(SRC_PATH)/complejo.h             \
+				  $(SRC_PATH)/utils.h             \
                                   $(BIN_PATH)
 
 $(BIN_PATH)/%.o: src/%.cpp
