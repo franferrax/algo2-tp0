@@ -101,7 +101,7 @@ void validateCommandLineArguments(int argc, char** argv, string &input,
 /*|/////////////////////////////////|   2)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|///////////////| Obtener complejo asociado a los índices |\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-void setComplexFromIndex (complejo &z, size_t i, size_t j,
+void getComplexFromIndex (complejo &z, size_t i, size_t j,
                           size_t h, size_t w)
 {
     if ( h && w && i < h && j < w)

@@ -27,7 +27,7 @@ using namespace std;
 void validateCommandLineArguments(int , char** , string &, string &, size_t &);
 
 // 2) Obtener complejo asociado a los índices
-void setComplexFromIndex (complejo &, size_t, size_t, size_t, size_t);
+void getComplexFromIndex (complejo &, size_t, size_t, size_t, size_t);
 
 // 3) Obtener la fila asociada al complejo ( [i][ ] )
 size_t getRowFromComplex (const complejo &, size_t);

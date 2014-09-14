@@ -85,7 +85,7 @@ int main (int argc, char** argv)
         for (j = 0; j < w; j++)
         {
             // Pixel en la imagen de salida <-> Punto en el plano de salida
-            setComplexFromIndex (out_plane, i, j, h, w);
+            getComplexFromIndex (out_plane, i, j, h, w);
 
             // Aplicación de la función, previamente seleccionada y apuntada
             (in_plane.*tranforms[function_index]) (out_plane);
