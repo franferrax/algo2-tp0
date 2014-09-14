@@ -1,7 +1,7 @@
 # Directorio de binarios
 bin/
+
+# Archivos de los editores
 nbproject/
 doc/
-
-# Archivo de intercambio de vim
 *.swp

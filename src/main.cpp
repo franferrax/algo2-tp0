@@ -1,60 +1,110 @@
 #include <iostream>
 #include <fstream>
-#include "GrayscaleCanvasPGM.h"
+#include "PGMimage.h"
 #include "complejo.h"
 #include "utils.h"
 
-int main(int argc, char** argv) // Main de pruebas, ejecutar con: bin/tp0
+
+const transform_t tranforms[] =
 {
-    
-    string in = "";
-    string out = "";
-    string function = "";
-    
-    cout << "/*** Probando linea de comandos ***/"<<endl;
-    validateCommandLineArguments(argc,argv,in,out,function);
-    
-    cout<<"El archivo de entrada es "<< in<<endl;
-    cout<<"El archivo de salida es "<< out<<endl;
-    cout<<"La funcion de entrada es "<< function<<endl;
-    
-    cout << "/*** Probando GrayscaleCanvasPGM ***/"<<endl;
-    // Archivo de entrada
-    ifstream infile;
-    infile.open("test/pre.pgm");
+    & complejo :: identidadDesde,
+    & complejo :: exponencialDesde,
+    & complejo :: cuadradoDesde,
+    & complejo :: cuboDesde,
+    & complejo :: senoDesde
+};
 
-    GrayscaleCanvasPGM image;
 
-    if ( !(infile >> image) )
+int main (int argc, char** argv)
+{
+    string in_file_name = "";
+    string out_file_name = "";
+    size_t function_index = 0;
+
+    // Validación de argumentos
+    validateCommandLineArguments (argc, argv, in_file_name, out_file_name,
+                                  function_index);
+
+    //////////////////////////////////////////////////////////////
+    // DEBUG
+    cerr << "El archivo de entrada es " << in_file_name  << endl;
+    cerr << "El archivo de salida es "  << out_file_name << endl;
+    cerr << "La funcion de entrada es " << function_index << endl;
+    //////////////////////////////////////////////////////////////
+
+    // Apertura del archivo de entrada o cin
+    istream *in_stream = &cin;
+    ifstream in_file;
+    if ( in_file_name != "cin" )
+    {
+        in_file.open (in_file_name.c_str ());
+        if (!in_file)
+        {
+            cerr << "No se pudo abrir el archivo de entrada, ¿existe?" << endl;
+            return 1;
+        }
+        in_stream = &in_file;
+    }
+
+    // Apertura del archivo de salida o cout
+    ostream *out_stream = &cout;
+    ofstream out_file;
+    if ( out_file_name != "cout" )
+    {
+        out_file.open (out_file_name.c_str ());
+        if (!out_file)
+        {
+            cerr << "No se pudo abrir el archivo de salida, ¿tiene permisos?"
+                 << endl;
+            return 1;
+        }
+        out_stream = &out_file;
+    }
+
+    // Lectura del archivo de entrada
+    PGMimage in_image;
+    if ( !(*in_stream >> in_image) )
     {
         cerr << "Imagen PGM con formato inválido" << endl;
         return 1;
     }
+    in_file.close ();
 
-    infile.close();
+    // Creación de una nueva imagen con las mismas dimensiones
+    size_t h = in_image.getHeight ();
+    size_t w = in_image.getWidth ();
 
-    // Oscurecimiento, probando la sobrecarga de [][]
-    size_t h = image.getHeight();
-    size_t w = image.getWidth();
+    PGMimage out_image (w, h, in_image.getColorDepth ());
 
-    for (size_t i = 0; i < h; i++)
-        for (size_t j = 0; j < w; j++)
-            image[i][j] *= 0.5;
+    // Recorrido de la imagen y transformación
+    complejo in_plane, out_plane;
+    size_t i, j, row, col;
 
-    // Cambio de profundidad
-    image.setColorDepth(4);
+    for (i = 0; i < h; i++)
+    {
+        for (j = 0; j < w; j++)
+        {
+            // Pixel en la imagen de salida <-> Punto en el plano de salida
+            setComplexFromIndex (out_plane, i, j, h, w);
 
-    // Archivo de salida
-    ofstream outfile;
-    outfile.open("test/post.pgm");
+            // Aplicación de la función, previamente seleccionada y apuntada
+            (in_plane.*tranforms[function_index]) (out_plane);
 
-    outfile << image;
+            // Punto en el plano de entrada <-> Pixel en la imagen de entrada
+            row = getRowFromComplex (in_plane, h);
+            col = getColFromComplex (in_plane, w);
 
-    outfile.close();
-    
-    cout << "/*** Probando complejos ***/"<<endl;
-    complejo z(5, -2);
-    cout << complejo::expo(z);
+            // Si no se cayó fuera de la imagen, se copia
+            if (row < h && col < w)
+            {
+                out_image[i][j] = in_image[row][col];
+            }
+        }
+    }
+
+    // Volcado en el archivo de salida
+    *out_stream << out_image;
+    out_file.close ();
 
     return 0;
 }

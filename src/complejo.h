@@ -21,9 +21,9 @@ public:
 
     ~complejo();
 
-    double GetReal()const; 
+    double GetReal()const;
 
-    double GetImag()const; 
+    double GetImag()const;
 
     void SetReal(double xx);
 
@@ -39,10 +39,15 @@ public:
 
     const complejo operator+(const double);
 
-    static complejo expo(const complejo &); //f(z) = e^z
-    
-    static complejo identidad(const complejo &); //f(z) = z
+    void identidadDesde(const complejo &); //f(z) = z
 
+    void exponencialDesde(const complejo &); //f(z) = e^z
+
+    void cuadradoDesde(const complejo &); //f(z) = z^2
+
+    void cuboDesde(const complejo &); //f(z) = z^3
+
+    void senoDesde(const complejo &); //f(z) = sin(z)
 };
 
 #endif

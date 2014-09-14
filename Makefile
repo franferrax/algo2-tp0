@@ -11,11 +11,11 @@ CFLAGS = -ansi -pedantic-errors -Wall -O3
 # Nombre de salida del proyecto:
 OUT = tp0
 # Directorio de archivos fuente:
-SRC_PATH = src
+SRC_DIR = src
 # Directorio de archivos binarios:
-BIN_PATH = bin
+BIN_DIR = bin
 # Directorio de instalación:
-INSTALL_PATH = /usr/bin
+INSTALL_DIR = /usr/bin
 
 
 
@@ -24,71 +24,69 @@ INSTALL_PATH = /usr/bin
 # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////// #
 
     # -------------------------- Códigos objeto -------------------------- #
-OBJECTS = $(BIN_PATH)/GrayscaleCanvasPGM.o \
-          $(BIN_PATH)/complejo.o           \
-	  $(BIN_PATH)/utils.o		    \
-          $(BIN_PATH)/main.o
+OBJECTS = $(BIN_DIR)/PGMimage.o  \
+          $(BIN_DIR)/complejo.o  \
+          $(BIN_DIR)/utils.o     \
+          $(BIN_DIR)/main.o
 
 
     # ---------------------- Reglas de construcción ---------------------- #
-$(BIN_PATH)/$(OUT): $(OBJECTS) $(BIN_PATH)
-	$(CC) $(LFLAGS) $(OBJECTS) -o $(BIN_PATH)/$(OUT)
+$(BIN_DIR)/$(OUT): $(OBJECTS) | $(BIN_DIR)
+	$(CC) $(LFLAGS) $(OBJECTS) -o $(BIN_DIR)/$(OUT)
 
-$(BIN_PATH)/GrayscaleCanvasPGM.o: $(SRC_PATH)/GrayscaleCanvasPGM.cpp \
-                                  $(SRC_PATH)/GrayscaleCanvasPGM.h   \
-                                  $(BIN_PATH)
+$(BIN_DIR)/PGMimage.o: $(SRC_DIR)/PGMimage.cpp \
+                       $(SRC_DIR)/PGMimage.h   \
+                     | $(BIN_DIR)
 
-$(BIN_PATH)/complejo.o:           $(SRC_PATH)/complejo.cpp           \
-                                  $(SRC_PATH)/complejo.h             \
-                                  $(BIN_PATH)
+$(BIN_DIR)/complejo.o: $(SRC_DIR)/complejo.cpp \
+                       $(SRC_DIR)/complejo.h   \
+                     | $(BIN_DIR)
 
-$(BIN_PATH)/utils.o:		    $(SRC_PATH)/utils.cpp           \
-                                  $(SRC_PATH)/utils.h             \
-                                  $(BIN_PATH)
+$(BIN_DIR)/utils.o:    $(SRC_DIR)/utils.cpp    \
+                       $(SRC_DIR)/utils.h      \
+                     | $(BIN_DIR)
 
-$(BIN_PATH)/main.o:               $(SRC_PATH)/main.cpp               \
-                                  $(SRC_PATH)/GrayscaleCanvasPGM.h   \
-                                  $(SRC_PATH)/complejo.h             \
-				  $(SRC_PATH)/utils.h             \
-                                  $(BIN_PATH)
+$(BIN_DIR)/main.o:     $(SRC_DIR)/main.cpp     \
+                       $(SRC_DIR)/PGMimage.h   \
+                       $(SRC_DIR)/complejo.h   \
+                       $(SRC_DIR)/utils.h      \
+                     | $(BIN_DIR)
 
-$(BIN_PATH)/%.o: src/%.cpp
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) -c $(CFLAGS) $< -o $@
 
-$(BIN_PATH):
-	mkdir $(BIN_PATH)
+$(BIN_DIR):
+	mkdir $(BIN_DIR)
 
 
 
 # //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ #
 # ||||||||||||||||||||||||||||| Utilidades extras |||||||||||||||||||||||||||| #
 # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////// #
-
-    # ---------------------- Limpiar códigos objeto ---------------------- #
-objclean:
-	rm -f $(BIN_PATH)/*.o
+.PHONY: clean objclean deltemps install all remove purge
 
     # -------------------------- Limpiar (todo) -------------------------- #
 clean:
-	rm -rf $(BIN_PATH)
+	rm -rf $(BIN_DIR)
+
+    # ---------------------- Limpiar códigos objeto ---------------------- #
+objclean:
+	rm -f $(BIN_DIR)/*.o
 
     # ------------- Construir y eliminar archivos temporales ------------- #
-deltemps: $(BIN_PATH)/$(OUT) objclean
+deltemps: $(BIN_DIR)/$(OUT) objclean
 
     # ------------------------------ Instalar ---------------------------- #
-install: $(BIN_PATH)/$(OUT)
-	@ cp $(BIN_PATH)/$(OUT) "$(INSTALL_PATH)"
-	@ echo "'$(OUT)' --> Instalado en: $(INSTALL_PATH)"
-
+install: $(BIN_DIR)/$(OUT)
+	@ cp $(BIN_DIR)/$(OUT) "$(INSTALL_DIR)"
+	@ echo "'$(OUT)' --> Instalado en: $(INSTALL_DIR)"
 
     # --------------------- Todo (instalar y limpiar) -------------------- #
 all: install clean
 
-
     # ---------------------------- Desinstalar --------------------------- #
 remove:
-	rm -f "$(INSTALL_PATH)/$(OUT)"
-
+	rm -f "$(INSTALL_DIR)/$(OUT)"
 
     # ------------------ Purgar (desinstalar y limpiar) ------------------ #
 purge: remove clean
