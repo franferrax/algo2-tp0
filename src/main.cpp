@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include "cmdline.h"
 #include "PGMimage.h"
 #include "complejo.h"
 #include "utils.h"
