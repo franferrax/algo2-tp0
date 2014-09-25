@@ -27,6 +27,7 @@ INSTALL_DIR = /usr/bin
 OBJECTS = $(BIN_DIR)/PGMimage.o  \
           $(BIN_DIR)/complejo.o  \
           $(BIN_DIR)/utils.o     \
+          $(BIN_DIR)/cmdline.o   \
           $(BIN_DIR)/main.o
 
 
@@ -46,10 +47,15 @@ $(BIN_DIR)/utils.o:    $(SRC_DIR)/utils.cpp    \
                        $(SRC_DIR)/utils.h      \
                      | $(BIN_DIR)
 
+$(BIN_DIR)/cmdline.o:  $(SRC_DIR)/cmdline.cpp  \
+                       $(SRC_DIR)/cmdline.h    \
+                     | $(BIN_DIR)
+
 $(BIN_DIR)/main.o:     $(SRC_DIR)/main.cpp     \
                        $(SRC_DIR)/PGMimage.h   \
                        $(SRC_DIR)/complejo.h   \
                        $(SRC_DIR)/utils.h      \
+                       $(SRC_DIR)/cmdline.h    \
                      | $(BIN_DIR)
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
@@ -79,7 +85,7 @@ deltemps: $(BIN_DIR)/$(OUT) objclean
     # ------------------------------ Instalar ---------------------------- #
 install: $(BIN_DIR)/$(OUT)
 	@ cp $(BIN_DIR)/$(OUT) "$(INSTALL_DIR)"
-	@ echo "'$(OUT)' --> Instalado en: $(INSTALL_DIR)"
+	@ echo "'$(OUT)' --> Installed in: $(INSTALL_DIR)"
 
     # --------------------- Todo (instalar y limpiar) -------------------- #
 all: install clean

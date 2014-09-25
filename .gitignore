@@ -6,3 +6,4 @@ nbproject/
 doc/
 *.swp
 *.~lock.*
+*.vim

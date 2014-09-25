@@ -35,7 +35,7 @@ class PGMimage
     // Limitar profundidad de color
     static void validate_color_depth(pixel_t &);
 
-    // Destruir el lienzo del objeto actual
+    // Destruir el lienzo sobre el objeto actual
     void canvasDestroy();
 
 

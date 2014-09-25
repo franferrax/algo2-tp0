@@ -263,7 +263,7 @@ void PGMimage::validate_color_depth(pixel_t &d)
     if (d < MIN_COLOR_DEPTH) d = MIN_COLOR_DEPTH;
 }
 
-// Destruir el lienzo del objeto actual
+// Destruir el lienzo sobre el objeto actual
 void PGMimage::canvasDestroy()
 {
     for (size_t i = 0; i < this->Height; i++)
