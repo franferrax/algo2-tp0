@@ -1,28 +1,27 @@
 #include "PGMimage.h"
-const string PGMimage :: MagicNumber = "P2";
+const string PGMimage::MagicNumber = "P2";
 
 
 
 /*|/////////////////////////////////|   1)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////| Constructor |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-PGMimage :: PGMimage (size_t w, size_t h, pixel_t d)
+PGMimage::PGMimage(size_t w, size_t h, pixel_t d)
 {
-    Width  = w;
-    Height = h;
+    this->Width  = w;
+    this->Height = h;
 
     // Limitación en la profundidad de color
-    if (d > MAX_COLOR_DEPTH) { d = MAX_COLOR_DEPTH; }
-    if (d < MIN_COLOR_DEPTH) { d = MIN_COLOR_DEPTH; }
-    ColorDepth = d;
+    PGMimage::validate_color_depth(d);
+    this->ColorDepth = d;
 
     // Memoria para el lienzo
-    canvas = PGMimage :: new_canvas (Width, Height);
+    this->canvas = PGMimage::new_canvas(this->Width, this->Height);
 
     // Inicialización en 0
     for (size_t i = 0; i < h; i++)
         for (size_t j = 0; j < w; j++)
-            canvas[i][j] = 0;
+            this->canvas[i][j] = 0;
 }
 
 
@@ -30,19 +29,19 @@ PGMimage :: PGMimage (size_t w, size_t h, pixel_t d)
 /*|/////////////////////////////////|   2)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|////////////////////////| Constructor por copia |\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-PGMimage :: PGMimage (const PGMimage &o)
+PGMimage::PGMimage(const PGMimage &o)
 {
-    Width  = o.Width;
-    Height = o.Height;
-    ColorDepth = o.ColorDepth;
+    this->Width  = o.Width;
+    this->Height = o.Height;
+    this->ColorDepth = o.ColorDepth;
 
     // Memoria para la copia
-    canvas = PGMimage :: new_canvas (Width, Height);
+    this->canvas = PGMimage::new_canvas(this->Width, this->Height);
 
     // Copia de los datos
-    for (size_t i = 0; i < Height; i++)
-        for (size_t j = 0; j < Width; j++)
-            canvas[i][j] = o.canvas[i][j];
+    for (size_t i = 0; i < this->Height; i++)
+        for (size_t j = 0; j < this->Width; j++)
+            this->canvas[i][j] = o.canvas[i][j];
 }
 
 
@@ -50,10 +49,12 @@ PGMimage :: PGMimage (const PGMimage &o)
 /*|/////////////////////////////////|   4)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|//////////| Indexación del lienzo (l-value y r-value: c[y][x]) |\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-pixel_t* PGMimage :: operator[] (size_t y) const
+pixel_t* PGMimage::operator[](size_t y) const
 {
-    if (y >= Height) { return canvas[Height-1]; }
-    return canvas[y];
+    if (y >= this->Height)
+        return this->canvas[this->Height-1];
+
+    return this->canvas[y];
 }
 
 
@@ -61,28 +62,27 @@ pixel_t* PGMimage :: operator[] (size_t y) const
 /*|/////////////////////////////////|  5-7) |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|////////////| Obtención de ancho, alto, profundidad de color |\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-size_t  PGMimage :: getWidth () const      { return Width;      }
-size_t  PGMimage :: getHeight () const     { return Height;     }
-pixel_t PGMimage :: getColorDepth () const { return ColorDepth; }
+size_t  PGMimage::getWidth() const      { return this->Width;      }
+size_t  PGMimage::getHeight() const     { return this->Height;     }
+pixel_t PGMimage::getColorDepth() const { return this->ColorDepth; }
 
 
 
 /*|/////////////////////////////////|   8)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|////////////////////| Cambio de profundidad de color |\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-void PGMimage :: setColorDepth (pixel_t d)
+void PGMimage::setColorDepth(pixel_t d)
 {
-    if (d > MAX_COLOR_DEPTH) { d = MAX_COLOR_DEPTH; }
-    if (d < MIN_COLOR_DEPTH) { d = MIN_COLOR_DEPTH; }
+    PGMimage::validate_color_depth(d);
 
     // Cálculo de factor de amplificación y actualización de la profundidad
-    float amp = (float) d / (float) ColorDepth;
-    ColorDepth = d;
+    float amp = (float) d / (float) this->ColorDepth;
+    this->ColorDepth = d;
 
     // Cálculo de los datos con la nueva profundidad
-    for (size_t i = 0; i < Height; i++)
-        for (size_t j = 0; j < Width; j++)
-            canvas[i][j] *= amp;
+    for (size_t i = 0; i < this->Height; i++)
+        for (size_t j = 0; j < this->Width; j++)
+            this->canvas[i][j] *= amp;
 }
 
 
@@ -90,29 +90,29 @@ void PGMimage :: setColorDepth (pixel_t d)
 /*|/////////////////////////////////|   9)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|//////////////////////| Cambio de tamaño de imagen |\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-void PGMimage :: resize (size_t w, size_t h)
+void PGMimage::resize(size_t w, size_t h)
 {
     size_t w_max, h_max;
-    pixel_t **aux;
+    pixel_t **auxcnv;
 
     // Memoria para el nuevo lienzo
-    aux = PGMimage :: new_canvas (w, h);
+    auxcnv = PGMimage::new_canvas(w, h);
 
     // Copiado de los datos, con posible pérdida por recorte
-    w_max = min (w, Width);
-    h_max = min (h, Height);
+    w_max = min(w, this->Width);
+    h_max = min(h, this->Height);
 
     for (size_t i = 0; i < h_max; i++)
         for (size_t j = 0; j < w_max; j++)
-            aux[i][j] = canvas[i][j];
+            auxcnv[i][j] = this->canvas[i][j];
 
     // Liberación de la memoria antigua
-    canvasDestroy ();
+    canvasDestroy();
 
     // Actualización de los valores
-    Width = w;
-    Height = h;
-    canvas = aux;
+    this->Width = w;
+    this->Height = h;
+    this->canvas = auxcnv;
 }
 // NOTA: no se realiza un escalado de la imagen, solo se modifica el lienzo,
 // resultando en posibles recortes o agregado de pixels con eventual basura.
@@ -122,7 +122,7 @@ void PGMimage :: resize (size_t w, size_t h)
 /*|/////////////////////////////////|  10)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|///////////////////| Impresión en flujo/archivo/stdin |\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-ostream & operator<< (ostream &os, const PGMimage &c)
+ostream & operator<<(ostream &os, const PGMimage &c)
 {
     // Encabezado del archivo
     os << c.MagicNumber << endl;
@@ -147,22 +147,30 @@ ostream & operator<< (ostream &os, const PGMimage &c)
 /*|/////////////////////////////////|  11)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|///////////////////| Carga desde flujo/archivo/stdin |\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-istream & operator>> (istream &is, PGMimage &c)
+istream & operator>>(istream &is, PGMimage &c)
 {
-    size_t w = 0, h = 0, d = 0, px = 0;
+    size_t w = 0, h = 0, aux = 0, i, j;
+    pixel_t d = 0, **auxcnv;
     bool errors = true;
 
     // Lectura del encabezado
-    int mnL = c.MagicNumber.length () + 1;
+    int mnL = c.MagicNumber.length() + 1;
     char *mn = new char[mnL];
-    is.get (mn, mnL);
+    is.get(mn, mnL);
+    // Número mágico
     if ( mn == c.MagicNumber )
     {
-        PGMimage :: ignore_comments (is);
+        PGMimage::ignore_comments(is);
+        // Ancho y alto
         if (is >> w && is >> h)
         {
-            PGMimage :: ignore_comments (is);
-            if (is >> d) { errors = false; }
+            PGMimage::ignore_comments(is);
+            // Profundidad de color
+            if (is >> aux)
+            {
+                d = aux;
+                errors = false;
+            }
         }
     }
     delete mn;
@@ -171,35 +179,44 @@ istream & operator>> (istream &is, PGMimage &c)
     if (!errors)
     {
         // Limitar profundidad de color
-        if (d > MAX_COLOR_DEPTH) { d = MAX_COLOR_DEPTH; }
-        if (d < MIN_COLOR_DEPTH) { d = MIN_COLOR_DEPTH; }
-
-        // Vaciar c
-        c.canvasDestroy ();
+        PGMimage::validate_color_depth(d);
 
         // Memoria para el lienzo
-        c.canvas = PGMimage :: new_canvas (w, h);
-
-        // Actualización de valores
-        c.Width = w;
-        c.Height = h;
-        c.ColorDepth = d;
+        auxcnv = PGMimage::new_canvas(w, h);
 
         // Carga de datos
-        for (size_t i = 0; i < h; i++)
+        for (i = 0; i < h; i++)
         {
-            for (size_t j = 0; j < w; j++)
+            for (j = 0; j < w; j++)
             {
-                PGMimage :: ignore_comments (is);
-                if (is >> px) { c.canvas[i][j] = px; }
+                PGMimage::ignore_comments(is);
+                if (is >> aux) auxcnv[i][j] = aux;
                 else { errors = true; break; }
             }
-            if (errors) { break; }
+            if (errors) break;
+        }
+
+        // Si no ha fallado la carga de valores
+        if (!errors)
+        {
+            // Actualización del objeto
+            c.canvasDestroy();
+            c.canvas = auxcnv;
+            c.Width = w;
+            c.Height = h;
+            c.ColorDepth = d;
+        }
+        // En caso de falla, se deja el objeto intacto y se destruye auxcnv
+        else
+        {
+            for (i = 0; i < h; i++)
+                delete [] auxcnv[i];
+            delete [] auxcnv;
         }
     }
 
-    // En caso de falla se indica en el stream
-    if (errors) { is.clear (ios :: badbit); }
+    if (errors) // Si hubo errores, se indica en el stream
+        is.clear(ios::badbit);
 
     return is;
 }
@@ -209,39 +226,48 @@ istream & operator>> (istream &is, PGMimage &c)
 /*|/////////////////////////////////|   *)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////| Utilidades internas |\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-void PGMimage :: ignore_comments (istream &s)
+
+// Ignorar comentarios estilo PGM en un stream
+void PGMimage::ignore_comments(istream &s)
 {
     char ch;
     while (s >> ch)
     {
         if (ch == '#')
         {
-            s.ignore (numeric_limits<streamsize> :: max (), '\n');
+            s.ignore(numeric_limits<streamsize>::max(), '\n');
         }
         else
         {
-            s.putback (ch);
+            s.putback(ch);
             break;
         }
     }
 }
 
-
-pixel_t** PGMimage :: new_canvas (size_t w, size_t h)
+// Pedir memoria para un lienzo de w x h
+pixel_t** PGMimage::new_canvas(size_t w, size_t h)
 {
-    pixel_t **canvas = new pixel_t* [h];
+    pixel_t **cnv = new pixel_t* [h];
 
     for (size_t i = 0; i < h; i++)
-        canvas[i] = new pixel_t[w];
+        cnv[i] = new pixel_t[w];
 
-    return canvas;
+    return cnv;
 }
 
-
-void PGMimage :: canvasDestroy ()
+// Limitar profundidad de color
+void PGMimage::validate_color_depth(pixel_t &d)
 {
-    for (size_t i = 0; i < Height; i++)
-        delete [] canvas[i];
+    if (d > MAX_COLOR_DEPTH) d = MAX_COLOR_DEPTH;
+    if (d < MIN_COLOR_DEPTH) d = MIN_COLOR_DEPTH;
+}
 
-    delete [] canvas;
+// Destruir el lienzo sobre el objeto actual
+void PGMimage::canvasDestroy()
+{
+    for (size_t i = 0; i < this->Height; i++)
+        delete [] this->canvas[i];
+
+    delete [] this->canvas;
 }

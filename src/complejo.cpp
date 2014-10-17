@@ -10,7 +10,7 @@ complejo::complejo (const complejo & c) : x(c.x) , y (c.y) {}
 
 complejo::complejo (double a, double b): x(a) , y(b) {}
 
-complejo::~complejo() {} 
+complejo::~complejo() {}
 
 ostream& operator<<(ostream &os, const complejo &c){
     os<<"("<<c.x<<","<<c.y<<")"<<endl;
