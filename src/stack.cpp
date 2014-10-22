@@ -6,27 +6,28 @@
  */
 
 #include <iostream>
+#include "stack.h"
 
 template <class T>
-stack::~stack() {
+stack<T>::~stack() {
     
    while(_last) pop();
    
 }
 
 template <class T>
-void stack::push(const T& v) {
+void stack<T>::push(const T& v) {
     
-   node *new_node;
-   new_node = new node(v, _last);
+   node<T> *new_node;
+   new_node = new node<T>(v, _last);
    
    _last = new_node; //asigno el nuevo nodo a la pila
 }
 
 template <class T>
-T stack::pop() {
+T stack<T>::pop() {
 
-   node *auxNode;
+   node<T> *auxNode;
    T v;
    
    if(!_last) return 0; //pila vacia
@@ -44,7 +45,7 @@ T stack::pop() {
 
 
 template <class T>
-bool stack::isEmpty() const {
+bool stack<T>::isEmpty() const {
 
     if(_last != NULL) return true;
     else return false;
@@ -52,7 +53,7 @@ bool stack::isEmpty() const {
 }
 
 template <class T>
-T& stack::topElement() {
+T& stack<T>::topElement() {
     
     return _last->_value;
     

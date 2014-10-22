@@ -28,6 +28,9 @@ OBJECTS = $(BIN_DIR)/PGMimage.o  \
           $(BIN_DIR)/complejo.o  \
           $(BIN_DIR)/utils.o     \
           $(BIN_DIR)/cmdline.o   \
+	  $(BIN_DIR)/queue.o	  \
+	  $(BIN_DIR)/node.o	  \
+	  $(BIN_DIR)/stack.o	  \
           $(BIN_DIR)/main.o
 
 
@@ -51,11 +54,26 @@ $(BIN_DIR)/cmdline.o:  $(SRC_DIR)/cmdline.cpp  \
                        $(SRC_DIR)/cmdline.h    \
                      | $(BIN_DIR)
 
-$(BIN_DIR)/main.o:     $(SRC_DIR)/main.cpp     \
+$(BIN_DIR)/queue.o:  $(SRC_DIR)/queue.cpp  \
+                       $(SRC_DIR)/queue.h    \
+                     | $(BIN_DIR)
+
+$(BIN_DIR)/node.o:  $(SRC_DIR)/node.cpp  \
+                       $(SRC_DIR)/node.h    \
+                     | $(BIN_DIR)
+
+$(BIN_DIR)/stack.o:  $(SRC_DIR)/stack.cpp  \
+                       $(SRC_DIR)/stack.h    \
+                     | $(BIN_DIR)
+
+$(BIN_DIR)/main.o:    $(SRC_DIR)/main.cpp     \
                        $(SRC_DIR)/PGMimage.h   \
                        $(SRC_DIR)/complejo.h   \
                        $(SRC_DIR)/utils.h      \
                        $(SRC_DIR)/cmdline.h    \
+		       $(SRC_DIR)/queue.h    \
+		       $(SRC_DIR)/node.h    \
+		       $(SRC_DIR)/stack.h    \
                      | $(BIN_DIR)
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp

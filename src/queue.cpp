@@ -7,13 +7,14 @@
 
 #include <iostream>
 #include "queue.h"
+#include "node.h"
 
 template <class T>
-void queue::enqueue(const T& v){
+void queue<T>::enqueue(const T& v){
     
-    node *newNode;
+    node<T> *newNode;
  
-    newNode = new node(v); //creamos un nuevo auxNode
+    newNode = new node<T>(v); //creamos un nuevo auxNode
     
     if(_last) _last->_next = newNode;// Si la cola no estaba vacía, añadimos el nuevo a continuación de ultimo
     
@@ -24,9 +25,9 @@ void queue::enqueue(const T& v){
 }
 
 template <class T>
-T queue::dequeue(){
+T queue<T>::dequeue(){
     
-    node *auxNode;
+    node<T> *auxNode;
     T v;
 
     auxNode = _first;
@@ -45,7 +46,7 @@ T queue::dequeue(){
 }
 
 template <class T>
-bool queue::isEmpty() const{
+bool queue<T>::isEmpty() const{
     
     if(_first != NULL) return true;
     else return false;
@@ -53,7 +54,7 @@ bool queue::isEmpty() const{
 }
 
 template <class T>
-T& queue::frontElement(){
+T& queue<T>::frontElement(){
     
     return _first->_value;
     

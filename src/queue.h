@@ -23,7 +23,7 @@ class queue {
         T& frontElement();
 
     private:
-        node *_first, *_last;
+        node<T> *_first, *_last;
 
 };
 

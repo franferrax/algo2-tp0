@@ -25,8 +25,8 @@ class stack {
         T pop();
         T& topElement();
 
-    private:        
-        node _last;    
+    private:
+        node<T> *_last;
 
 };
 

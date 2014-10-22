@@ -8,18 +8,21 @@
 #ifndef NODE_H
 #define	NODE_H
 
+#include "stack.h"
+#include "queue.h"
+
 template <class T>
 class node {
 
     public:
-        node(T , node * );
+        node(T , node<T> * );
 
     private:
         T _value;
-        node *_next;
+        node<T> *_next;
 
-    friend class stack;
-    friend class queue;
+    friend class stack<T>;
+    friend class queue<T>;
 };
 
 #endif	/* NODE_H */
