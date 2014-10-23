@@ -9,7 +9,7 @@ LFLAGS = -pedantic -Wall
 # Flags para compilación:
 CFLAGS = -ansi -pedantic-errors -Wall -O3
 # Nombre de salida del proyecto:
-OUT = tp0
+OUT = tp1
 # Directorio de archivos fuente:
 SRC_DIR = src
 # Directorio de archivos binarios:
@@ -24,48 +24,55 @@ INSTALL_DIR = /usr/bin
 # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////// #
 
     # -------------------------- Códigos objeto -------------------------- #
-OBJECTS = $(BIN_DIR)/PGMimage.o  \
-          $(BIN_DIR)/complejo.o  \
-          $(BIN_DIR)/utils.o     \
-          $(BIN_DIR)/cmdline.o   \
-          $(BIN_DIR)/main.o
-
+OBJECTS = $(addprefix $(BIN_DIR)/, \
+    PGMimage.o   \
+    complejo.o   \
+    utils.o      \
+    cmdline.o    \
+    main.o       \
+)
 
     # ---------------------- Reglas de construcción ---------------------- #
 $(BIN_DIR)/$(OUT): $(OBJECTS) | $(BIN_DIR)
 	$(CC) $(LFLAGS) $(OBJECTS) -o $(BIN_DIR)/$(OUT)
-
-$(BIN_DIR)/PGMimage.o: $(SRC_DIR)/PGMimage.cpp \
-                       $(SRC_DIR)/PGMimage.h   \
-                     | $(BIN_DIR)
-
-$(BIN_DIR)/complejo.o: $(SRC_DIR)/complejo.cpp \
-                       $(SRC_DIR)/complejo.h   \
-                     | $(BIN_DIR)
-
-$(BIN_DIR)/utils.o:    $(SRC_DIR)/utils.cpp    \
-                       $(SRC_DIR)/utils.h      \
-                     | $(BIN_DIR)
-
-$(BIN_DIR)/cmdline.o:  $(SRC_DIR)/cmdline.cpp  \
-                       $(SRC_DIR)/cmdline.h    \
-                     | $(BIN_DIR)
-
-$(BIN_DIR)/main.o:     $(SRC_DIR)/main.cpp     \
-                       $(SRC_DIR)/PGMimage.h   \
-                       $(SRC_DIR)/complejo.h   \
-                       $(SRC_DIR)/utils.h      \
-                       $(SRC_DIR)/cmdline.h    \
-                       $(SRC_DIR)/node.h       \
-                       $(SRC_DIR)/queue.h      \
-                       $(SRC_DIR)/stack.h      \
-                     | $(BIN_DIR)
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) -c $(CFLAGS) $< -o $@
 
 $(BIN_DIR):
 	mkdir $(BIN_DIR)
+
+    # --------------------------- Dependencias --------------------------- #
+$(BIN_DIR)/PGMimage.o: | $(BIN_DIR) $(addprefix $(SRC_DIR)/, \
+    PGMimage.cpp \
+    PGMimage.h   \
+)
+
+$(BIN_DIR)/complejo.o: | $(BIN_DIR) $(addprefix $(SRC_DIR)/, \
+    complejo.cpp \
+    complejo.h   \
+)
+
+$(BIN_DIR)/utils.o:    | $(BIN_DIR) $(addprefix $(SRC_DIR)/, \
+    utils.cpp    \
+    utils.h      \
+)
+
+$(BIN_DIR)/cmdline.o:  | $(BIN_DIR) $(addprefix $(SRC_DIR)/, \
+    cmdline.cpp  \
+    cmdline.h    \
+)
+
+$(BIN_DIR)/main.o:     | $(BIN_DIR) $(addprefix $(SRC_DIR)/, \
+    main.cpp     \
+    PGMimage.h   \
+    complejo.h   \
+    utils.h      \
+    cmdline.h    \
+    node.h       \
+    queue.h      \
+    stack.h      \
+)
 
 
 
