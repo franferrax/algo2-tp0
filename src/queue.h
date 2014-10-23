@@ -66,8 +66,7 @@ T queue<T>::dequeue(){
 template <class T>
 bool queue<T>::isEmpty() const{
 
-    if(_first != NULL) return true;
-    else return false;
+    return _first == NULL; //estar vacía es tener _first en NULL
 
 }
 
