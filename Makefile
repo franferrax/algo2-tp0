@@ -31,18 +31,19 @@ OBJECTS = $(addprefix $(BIN_DIR)/, \
     cmdline.o    \
     main.o       \
 )
+FULL_OUT = $(BIN_DIR)/$(OUT)
 
     # ---------------------- Reglas de construcción ---------------------- #
-$(BIN_DIR)/$(OUT): $(OBJECTS) | $(BIN_DIR)
-	$(CC) $(LFLAGS) $(OBJECTS) -o $(BIN_DIR)/$(OUT)
+$(FULL_OUT): $(OBJECTS) | $(BIN_DIR)
+	$(CC) $(LFLAGS) $(OBJECTS) -o $(FULL_OUT) $(DFLAGS)
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@ $(DFLAGS)
 
 $(BIN_DIR):
 	mkdir $(BIN_DIR)
 
-    # --------------------------- Dependencias --------------------------- #
+    # -------------------------- Dependencias ---------------------------- #
 $(BIN_DIR)/PGMimage.o: | $(BIN_DIR) $(addprefix $(SRC_DIR)/, \
     PGMimage.cpp \
     PGMimage.h   \
@@ -79,7 +80,12 @@ $(BIN_DIR)/main.o:     | $(BIN_DIR) $(addprefix $(SRC_DIR)/, \
 # //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ #
 # ||||||||||||||||||||||||||||| Utilidades extras |||||||||||||||||||||||||||| #
 # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////// #
-.PHONY: clean objclean deltemps install all remove purge
+.PHONY: debug clean objclean deltemps install all remove purge
+
+    # ----------- Debug (limpiar y compilar con flag de debug) ----------- #
+debug:
+	@ rm -rf $(BIN_DIR)/*.o
+	@ make --no-print-directory DFLAGS="-g -DDEBUG"
 
     # -------------------------- Limpiar (todo) -------------------------- #
 clean:
@@ -90,11 +96,11 @@ objclean:
 	rm -f $(BIN_DIR)/*.o
 
     # ------------- Construir y eliminar archivos temporales ------------- #
-deltemps: $(BIN_DIR)/$(OUT) objclean
+deltemps: $(FULL_OUT) objclean
 
     # ------------------------------ Instalar ---------------------------- #
-install: $(BIN_DIR)/$(OUT)
-	@ cp $(BIN_DIR)/$(OUT) "$(INSTALL_DIR)"
+install: $(FULL_OUT)
+	@ cp $(FULL_OUT) "$(INSTALL_DIR)"
 	@ echo "'$(OUT)' --> Installed in: $(INSTALL_DIR)"
 
     # --------------------- Todo (instalar y limpiar) -------------------- #
