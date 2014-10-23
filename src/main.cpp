@@ -5,7 +5,6 @@
 #include "complejo.h"
 #include "utils.h"
 #include "stack.h"
-#include "queue.h"
 
 
 ////////////////////////////// Variables globales //////////////////////////////

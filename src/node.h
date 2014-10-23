@@ -25,5 +25,11 @@ class node {
     friend class queue<T>;
 };
 
+template <class T>
+node<T>::node(T v, node<T> *nxt = NULL) {
+    _value = v;
+    _next = nxt;
+}
+
 #endif	/* NODE_H */
 
