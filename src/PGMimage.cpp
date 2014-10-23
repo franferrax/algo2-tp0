@@ -1,5 +1,6 @@
 #include "PGMimage.h"
 const string PGMimage::MagicNumber = "P2";
+#define MAGIC_NUMBER_LENGTH 2
 
 
 
@@ -152,11 +153,10 @@ istream & operator>>(istream &is, PGMimage &c)
     size_t w = 0, h = 0, aux = 0, i, j;
     pixel_t d = 0, **auxcnv;
     bool errors = true;
+    char mn[MAGIC_NUMBER_LENGTH + 1];
 
     // Lectura del encabezado
-    int mnL = c.MagicNumber.length() + 1;
-    char *mn = new char[mnL];
-    is.get(mn, mnL);
+    is.get(mn, MAGIC_NUMBER_LENGTH + 1);
     // Número mágico
     if ( mn == c.MagicNumber )
     {
@@ -173,7 +173,6 @@ istream & operator>>(istream &is, PGMimage &c)
             }
         }
     }
-    delete mn;
 
     // Lectura de los datos de pixel
     if (!errors)
