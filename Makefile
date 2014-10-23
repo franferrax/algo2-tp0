@@ -51,14 +51,14 @@ $(BIN_DIR)/cmdline.o:  $(SRC_DIR)/cmdline.cpp  \
                        $(SRC_DIR)/cmdline.h    \
                      | $(BIN_DIR)
 
-$(BIN_DIR)/main.o:    $(SRC_DIR)/main.cpp     \
+$(BIN_DIR)/main.o:     $(SRC_DIR)/main.cpp     \
                        $(SRC_DIR)/PGMimage.h   \
                        $(SRC_DIR)/complejo.h   \
                        $(SRC_DIR)/utils.h      \
                        $(SRC_DIR)/cmdline.h    \
-		       $(SRC_DIR)/queue.h    \
-		       $(SRC_DIR)/node.h    \
-		       $(SRC_DIR)/stack.h    \
+                       $(SRC_DIR)/node.h       \
+                       $(SRC_DIR)/queue.h      \
+                       $(SRC_DIR)/stack.h      \
                      | $(BIN_DIR)
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp

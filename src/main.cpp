@@ -30,7 +30,7 @@ char *prog_name;
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
 int main(int argc, char** argv)
 {
-    
+
     /******************* PRUEBA PILA Y COLA **********************/
     cout << "/********************* PRUEBA PILA *********************/" << endl;
     stack<int> Pila;
@@ -38,14 +38,14 @@ int main(int argc, char** argv)
     cout<< "Pila esta vacia: ";
     if(Pila.isEmpty()) cout << "si" <<endl;
     else cout << "no" <<endl;
-    
+
     Pila.push(20);
     cout << "Push(20)" << endl;
-    
+
     cout<< "Pila esta vacia: ";
     if(Pila.isEmpty()) cout << "si" <<endl;
     else cout << "no" <<endl;
-    
+
     Pila.push(10);
     cout << "Push(10)" << endl;
     cout << "Pop() = " << Pila.pop() << endl;
@@ -57,11 +57,11 @@ int main(int argc, char** argv)
     cout << "Pop() = " << Pila.pop() << endl;
     Pila.push(90);
     cout << "Push(90)" << endl;
-    cout << "Pop() = " << pila.pop() << endl;
-    cout << "Pop() = " << pila.pop() << endl;
+    cout << "Pop() = " << Pila.pop() << endl;
+    cout << "Pop() = " << Pila.pop() << endl;
     exit(1);
     /******************* PRUEBA PILA Y COLA **********************/
-    
+
     prog_name = argv[0];
     // Validación de argumentos
     cmdline cmdl(options);

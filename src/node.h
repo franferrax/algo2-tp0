@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   node.h
  * Author: juanzaragoza
  *
@@ -8,8 +8,10 @@
 #ifndef NODE_H
 #define	NODE_H
 
-#include "stack.h"
-#include "queue.h"
+// Clases que utilizarán la clase nodo
+template <class T> class queue;
+template <class T> class stack;
+
 
 template <class T>
 class node {
@@ -32,4 +34,3 @@ node<T>::node(T v, node<T> *nxt = NULL) {
 }
 
 #endif	/* NODE_H */
-
