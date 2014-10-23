@@ -12,17 +12,20 @@ using namespace std;
 ////////////////////////////// Variables globales //////////////////////////////
 option_t options[] =
 {
-    {true,  "i", "input",    "-",  opt_input,    OPT_DEFAULT},
-    {true,  "o", "output",   "-",  opt_output,   OPT_DEFAULT},
-    {true,  "f", "function", "z",  opt_function, OPT_DEFAULT},
-    {false, "h", "help",     NULL, opt_help,     OPT_DEFAULT},
+    {true,  "i", "input",    "-",       opt_input,    OPT_DEFAULT},
+    {true,  "o", "output",   "-",       opt_output,   OPT_DEFAULT},
+    {true,  "f", "function", "z",       opt_function, OPT_DEFAULT},
+    {true,  "r", "region",   "2,2,0,0", opt_region,   OPT_DEFAULT},
+    {false, "h", "help",     NULL,      opt_help,     OPT_DEFAULT},
     {0, },
 };
-function_t complex_function = NULL;
 istream *iss = NULL;
 ostream *oss = NULL;
 fstream ifs;
 fstream ofs;
+double map_w;
+double map_h;
+complejo map_c;
 char *prog_name;
 
 
@@ -38,10 +41,10 @@ int main(int argc, char** argv)
     cout << "/******************* PRUEBA CONVERT RPN **********************/"<<endl;
     cout << cadena <<endl;
     cout << convertToRPN(cadena) << endl;
-    exit(1);
     /******************* PRUEBA CONVERT RPN **********************/
 
     prog_name = argv[0];
+
     // Validación de argumentos
     cmdline cmdl(options);
     cmdl.parse(argc, argv);
@@ -72,8 +75,8 @@ int main(int argc, char** argv)
             // Pixel en la imagen de salida <-> Punto en el plano de salida
             getComplexFromIndex(out_plane, i, j, h, w);
 
-            // Aplicación de la función, previamente seleccionada y apuntada
-            (in_plane.*complex_function)(out_plane);
+            // Aplicación de la función
+            in_plane = out_plane; // TODO: evaluación de RPN
 
             // Punto en el plano de entrada <-> Pixel en la imagen de entrada
             row = getRowFromComplex(in_plane, h);

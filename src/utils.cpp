@@ -14,7 +14,7 @@
 /*|/////////////////////////////////|   1)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|///////////////////////| CLA: Archivo de entrada |\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-void opt_input(string const &arg)
+void opt_input(const string &arg)
 {
     // Por defecto stdin, o bien archivo
     if (arg == "-")
@@ -43,7 +43,7 @@ void opt_input(string const &arg)
 /*|/////////////////////////////////|   2)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|////////////////////////| CLA: Archivo de salida |\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-void opt_output(string const &arg)
+void opt_output(const string &arg)
 {
     // Por defecto stdout, o bien archivo
     if (arg == "-")
@@ -72,52 +72,80 @@ void opt_output(string const &arg)
 /*|/////////////////////////////////|   3)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|////////////////////////| CLA: Función a aplicar |\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-void opt_function(string const &arg)
+void opt_function(const string &arg)
 {
-    for (size_t i=0; functions_opts[i]!=""; i++)
-    {
-        // Si se encuentra la función en la lista de las disponibles
-        if(arg == functions_opts[i])
-        {
-            complex_function = functions_ptrs[i];
-            return;
-        }
-    }
-
-    // Si no se retornó antes, el parámetro es inválido
-    cerr << "Invalid function parameter: "
-         << arg
-         << "."
-         << endl;
-    exit(1);
+    // TODO: aquí va el parseo de la expresión en notación infija.
 }
 
 
 
 /*|/////////////////////////////////|   4)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*|////////////////////| CLA: Región del plano complejo |\\\\\\\\\\\\\\\\\\\\|*/
+/*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+void opt_region(const string &arg)
+{
+    double aux;
+    stringstream arg_stream(arg);
+    bool errors = true;
+
+    if (arg_stream >> map_w)
+    {
+        arg_stream.ignore();
+
+        if (arg_stream >> map_h)
+        {
+            arg_stream.ignore();
+
+            if (arg_stream >> aux)
+            {
+                map_c.SetReal(aux);
+                arg_stream.ignore();
+
+                if (arg_stream >> aux)
+                {
+                    map_c.SetImag(aux);
+                    errors = false;
+                }
+            }
+        }
+    }
+
+    if (errors)
+    {
+        cerr << "Invalid region description: "
+             << arg
+             << "."
+             << endl;
+        exit(1);
+    }
+
+    if (map_w <= 0 || map_h <=0)
+    {
+        cerr << map_w << "," << map_h
+             << ": must be positive nonzero numbers."
+             << endl;
+        exit(1);
+    }
+
+}
+
+
+
+/*|/////////////////////////////////|   5)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|//////////////////////////////| CLA: Ayuda |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-void opt_help(string const &arg)
+void opt_help(const string &arg)
 {
     cout << "Usage: "
          << prog_name
-         << " [-i file] [-o file] [-f function]"
-         << endl
-         << "Function list: "
-         << functions_opts[0];
-
-    for (size_t i=1; functions_opts[i]!=""; i++)
-        cout << ", "
-             << functions_opts[i];
-
-    cout << "."
+         << " [-i file] [-o file] [-r w,h,x0,y0] [-f function]"
          << endl;
     exit(0);
 }
 
 
 
-/*|/////////////////////////////////|   5)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*|/////////////////////////////////|   6)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|///////////////| Obtener complejo asociado a los índices |\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 void getComplexFromIndex(complejo &z, size_t i, size_t j,
@@ -125,51 +153,54 @@ void getComplexFromIndex(complejo &z, size_t i, size_t j,
 {
     if ( h && w && i < h && j < w)
     {
-        z.SetReal( MAP_X * ( ((double)j + 0.5) / (double)w  -  0.5 ) );
-        z.SetImag( MAP_Y * ( 0.5  -  ((double)i + 0.5) / (double)h ) );
+        z.SetReal( map_w * ( ((double)j + 0.5) / (double)w  -  0.5 ) );
+        z.SetImag( map_h * ( 0.5  -  ((double)i + 0.5) / (double)h ) );
+        z += map_c;
     }
 }
 
 
 
-/*|/////////////////////////////////|   6)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*|/////////////////////////////////|   7)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|///////////| Obtener la fila asociada al complejo ( [i][ ] ) |\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 size_t getRowFromComplex(const complejo &z, size_t h)
 {
-    return h * ( 0.5 - z.GetImag() / MAP_Y );
+    return h * ( 0.5 - (z.GetImag()-map_c.GetImag()) / map_h );
 }
 
 
 
-/*|/////////////////////////////////|   7)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*|/////////////////////////////////|   8)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|//////////| Obtener la columna asociada al complejo ( [ ][j] ) \\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 size_t getColFromComplex(const complejo &z, size_t w)
 {
-    return w * ( 0.5 + z.GetReal() / MAP_X );
+    return w * ( 0.5 + (z.GetReal()-map_c.GetReal()) / map_w );
 }
 
-/*|/////////////////////////////////|   8)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-/*|/////////////////////| Conversion a notacion polaca \\\\\\\\\\\\\\\\\\\\\\|*/
+
+
+/*|/////////////////////////////////|   9)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*|/////////////////| Conversión a notación polaca inversa |\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-std::string convertToRPN(const std::string &expr){
-    
+string convertToRPN(const string &expr){
+
     char caux;
-    std::string result;
+    string result;
     stack<char> container;
     bool flagExpectingOperator = false;
-    
+
     for (size_t i = 0; i < expr.length(); ++i) {
-        
+
         caux = expr.at(i);
-        
-        if(caux==' '){ //vacio. No hago nada
-            
+
+        if (caux==' '){ //vacio. No hago nada
+
             continue;
-            
-        } else if(isOperator(caux)){//Si el token es un operador, o1, entonces:
-            
+
+        } else if (isOperator(caux)){//Si el token es un operador, o1, entonces:
+
             if (!flagExpectingOperator){
                 //devolver algo mas interesante
                 cout<<"Error de parametro"<<endl;
@@ -180,7 +211,7 @@ std::string convertToRPN(const std::string &expr){
             mientras que haya un operador, o2, en el tope de la pila (esto excluye el paréntesis abierto), y
                 o1 es asociativo izquierdo y su precedencia es menor que (una precedencia más baja) o igual a la de o2, ó
                 o1 es asociativo derecho y su precedencia es menor que (una precedencia más baja) que la de o2,
-            retire (pop) de la pila el o2, y póngalo en la cola de salida;  
+            retire (pop) de la pila el o2, y póngalo en la cola de salida;
              */
             while (!container.isEmpty() && isOperator(container.topElement()) &&
                    precedenceOf(container.topElement()) >= precedenceOf(caux)) {
@@ -191,9 +222,9 @@ std::string convertToRPN(const std::string &expr){
             //ponga (push) o1 en el tope de la pila.
             container.push(caux);
 
-            //Ya no estamos esperando un operador; que acabamos de encontrar uno 
+            //Ya no estamos esperando un operador; que acabamos de encontrar uno
             flagExpectingOperator = false;
-            
+
         } else if (caux == '(') { //Si el token es un paréntesis abierto, entonces póngalo en la pila.
             //si esperaba un operador
             if (flagExpectingOperator){
@@ -210,13 +241,13 @@ std::string convertToRPN(const std::string &expr){
                 exit(1);
             }
 
-            /*Hasta que el token en el tope de la pila sea un paréntesis abierto, retire (pop) a los 
+            /*Hasta que el token en el tope de la pila sea un paréntesis abierto, retire (pop) a los
             operadores de la pila y colóquelos en la cola de salida.*/
             while (!container.isEmpty() && container.topElement() != '(') {
                 result.append(1u,container.topElement());
                 container.pop();
             }
-            
+
             //Si la pila se termina sin encontrar un paréntesis abierto, entonces hay paréntesis sin pareja.
             if (container.isEmpty()){
                 //devolver algo mas interesante
@@ -229,7 +260,7 @@ std::string convertToRPN(const std::string &expr){
 
             /* Ahora esperamos un operador */
             flagExpectingOperator = true;
-            
+
         } else { //encuentre un numero
             /* If we're expecting an operator, we're very disappointed. */
             if (flagExpectingOperator){
@@ -241,17 +272,17 @@ std::string convertToRPN(const std::string &expr){
             //Si el token es un número, entonces agregúelo a la cola de salida
             result.append(1u,caux);
             flagExpectingOperator = true;
-            
+
         }
     }
-    
+
     //ya se parseo todo el string. Esperamos un operador ya que lo ultimo fue un valor
     if (!flagExpectingOperator){
         cout<<"Se esperaba un valor"<<endl;
         exit(1);
     }
-    
-    /*  
+
+    /*
     Cuando no hay más tokens para leer:
         Mientras todavía haya tokens de operadores en la pila:
             Si el token del operador en el tope de la pila es un paréntesis, entonces hay paréntesis sin la pareja correspondiente.
@@ -265,7 +296,7 @@ std::string convertToRPN(const std::string &expr){
         result.append(1u,container.topElement());
         container.pop();
     }
-    
+
     return result;
 
 }

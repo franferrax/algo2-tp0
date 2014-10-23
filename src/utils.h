@@ -9,49 +9,36 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <cstdlib>
 #include "complejo.h"
 #include "cmdline.h"
 using namespace std;
 
 
-// Porción del plano complejo a utilizar
-#define MAP_X 2  // Ancho del mapeo centrado en el origen
-#define MAP_Y 2  // Alto del mapeo centrado en el origen
-
-
-// Tipo para los punteros a función compleja
-typedef void (complejo::*function_t)(const complejo&);
-
 
 //////////////////////// Variables globales de main.cpp ////////////////////////
 extern option_t options[];            // Opciones CLA
-extern function_t complex_function;   // Puntero a función compleja
 extern istream *iss;                  // Puntero a stream de entrada
 extern ostream *oss;                  // Puntero a stream de salida
 extern fstream ifs;                   // Archivo de entrada
 extern fstream ofs;                   // Archivo de salida
 extern char *prog_name;               // Nombre del programa
+extern double map_w;                  // Ancho de la región de mapeo
+extern double map_h;                  // Alto de la región de mapeo
+extern complejo map_c;                // Centro de la región de mapeo
 
 
 /////////////////// Configuraciones de la función a aplicar ////////////////////
-static const string functions_opts[] = // Argumentos de la opción -f
+static const string special_tokens[] = // Funciones a interpretar
 {
-    "z",
-    "exp(z)",
-    "z^2",
-    "z^3",
-    "sin(z)",
+    "exp",
+    "ln",
+    "re",
+    "im",
+    "abs",
+    "phase",
     "" // No olvidar centinela de cadena vacía
-};
-
-static const function_t functions_ptrs[] = // Punteros a funciones complejas
-{
-    &complejo::identidadDesde,
-    &complejo::exponencialDesde,
-    &complejo::cuadradoDesde,
-    &complejo::cuboDesde,
-    &complejo::senoDesde
 };
 
 
@@ -61,28 +48,32 @@ static const function_t functions_ptrs[] = // Punteros a funciones complejas
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
 
 // 1) CLA: Archivo de entrada
-void opt_input(string const &);
+void opt_input(const string &);
 
 // 2) CLA: Archivo de salida
-void opt_output(string const &);
+void opt_output(const string &);
 
 // 3) CLA: Función a aplicar
-void opt_function(string const &);
+void opt_function(const string &);
 
-// 4) CLA: Ayuda
-void opt_help(string const &);
+// 4) CLA: Región del plano complejo
+void opt_region(const string &);
 
-// 5) Obtener complejo asociado a los índices
+// 5) CLA: Ayuda
+void opt_help(const string &);
+
+// 6) Obtener complejo asociado a los índices
 void getComplexFromIndex(complejo &, size_t, size_t, size_t, size_t);
 
-// 6) Obtener la fila asociada al complejo ( [i][ ] )
+// 7) Obtener la fila asociada al complejo ( [i][ ] )
 size_t getRowFromComplex(const complejo &, size_t);
 
-// 7) Obtener la columna asociada al complejo ( [ ][j] )
+// 8) Obtener la columna asociada al complejo ( [ ][j] )
 size_t getColFromComplex(const complejo &, size_t);
 
-std::string convertToRPN(const std::string &);
-bool isOperator(const char& );
-int precedenceOf(const char& );
+// 9) Conversión a notación polaca inversa
+string convertToRPN(const string &);
+bool isOperator(const char&);
+int precedenceOf(const char&);
 
 #endif    /* UTILS_H */
