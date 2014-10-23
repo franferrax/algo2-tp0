@@ -76,6 +76,9 @@ double complejo::GetPha()const {
     return atan2(this->y, this->x);
 }
 
+
+/* ////////////| Operadores, solo los utilizados, faltan algunos |/////////// */
+
 const complejo complejo::operator+(const complejo &r)const {
     return complejo (this->x+r.x, this->y+r.y);
 }
@@ -84,8 +87,18 @@ const complejo complejo::operator+(const double f)const {
     return complejo (this->x+f, this->y);
 }
 
+void complejo::operator+=(const complejo &c) {
+    this->x += c.x;
+    this->y += c.y;
+}
+
 const complejo complejo::operator-(const complejo &c)const {
     return complejo (this->x - c.x, this->y - c.y);
+}
+
+void complejo::operator-=(const complejo &c) {
+    this->x -= c.x;
+    this->y -= c.y;
 }
 
 const complejo complejo::operator*(const complejo &c)const {
@@ -100,6 +113,9 @@ const complejo complejo::operator/(const complejo &c)const {
     return complejo ( (this->x * c.x + this->y * c.y) / aux,
                       (this->y * c.x - this->x * c.y) / aux );
 }
+
+
+/* /////////////| Miembros estáticos, funciones exp, log y pow |///////////// */
 
 //exp(z) = exp(x+iy) = exp(x) * exp(iy) = exp(x) * (cos(y) + i sin(y))
 const complejo complejo::Exp(const complejo &z) {

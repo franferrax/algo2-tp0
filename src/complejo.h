@@ -43,7 +43,11 @@ public:
 
     const complejo operator+(const double)const;
 
+    void operator+=(const complejo &);
+
     const complejo operator-(const complejo &)const;
+
+    void operator-=(const complejo &);
 
     const complejo operator*(const complejo &)const;
 
