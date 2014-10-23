@@ -81,4 +81,8 @@ size_t getRowFromComplex(const complejo &, size_t);
 // 7) Obtener la columna asociada al complejo ( [ ][j] )
 size_t getColFromComplex(const complejo &, size_t);
 
+std::string convertToRPN(const std::string &);
+bool isOperator(const char& );
+int precedenceOf(const char& );
+
 #endif    /* UTILS_H */

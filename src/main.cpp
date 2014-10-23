@@ -5,7 +5,9 @@
 #include "complejo.h"
 #include "utils.h"
 #include "stack.h"
+#include <string>
 
+using namespace std;
 
 ////////////////////////////// Variables globales //////////////////////////////
 option_t options[] =
@@ -31,36 +33,13 @@ char *prog_name;
 int main(int argc, char** argv)
 {
 
-    /******************* PRUEBA PILA Y COLA **********************/
-    cout << "/********************* PRUEBA PILA *********************/" << endl;
-    stack<int> Pila;
-
-    cout<< "Pila esta vacia: ";
-    if(Pila.isEmpty()) cout << "si" <<endl;
-    else cout << "no" <<endl;
-
-    Pila.push(20);
-    cout << "Push(20)" << endl;
-
-    cout<< "Pila esta vacia: ";
-    if(Pila.isEmpty()) cout << "si" <<endl;
-    else cout << "no" <<endl;
-
-    Pila.push(10);
-    cout << "Push(10)" << endl;
-    cout << "Pop() = " << Pila.pop() << endl;
-    Pila.push(40);
-    cout << "Push(40)" << endl;
-    Pila.push(30);
-    cout << "Push(30)" << endl;
-    cout << "Pop() = " << Pila.pop() << endl;
-    cout << "Pop() = " << Pila.pop() << endl;
-    Pila.push(90);
-    cout << "Push(90)" << endl;
-    cout << "Pop() = " << Pila.pop() << endl;
-    cout << "Pop() = " << Pila.pop() << endl;
+    /******************* PRUEBA CONVERT RPN **********************/
+    string cadena = "(2 + 3) * 3";
+    cout << "/******************* PRUEBA CONVERT RPN **********************/"<<endl;
+    cout << cadena <<endl;
+    cout << convertToRPN(cadena) << endl;
     exit(1);
-    /******************* PRUEBA PILA Y COLA **********************/
+    /******************* PRUEBA CONVERT RPN **********************/
 
     prog_name = argv[0];
     // Validación de argumentos
