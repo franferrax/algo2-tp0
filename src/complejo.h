@@ -9,13 +9,13 @@ class complejo
 {
 private:
 
-    double x,y;
+    double x, y;
 
 public:
 
     complejo();
 
-    complejo(double , double );
+    complejo(double , double);
 
     complejo(const complejo &);
 
@@ -29,25 +29,31 @@ public:
 
     void SetImag(double yy);
 
+    double GetArg()const;
+
+    double GetPha()const;
+
     friend ostream& operator<<(ostream&, const complejo &);
 
-    friend istream& operator>>(istream&,complejo &);
+    friend istream& operator>>(istream&, complejo &);
 
     complejo& operator=(const complejo &);
 
-    const complejo operator+(const complejo &);
+    const complejo operator+(const complejo &)const;
 
-    const complejo operator+(const double);
+    const complejo operator+(const double)const;
 
-    void identidadDesde(const complejo &); //f(z) = z
+    const complejo operator-(const complejo &)const;
 
-    void exponencialDesde(const complejo &); //f(z) = e^z
+    const complejo operator*(const complejo &)const;
 
-    void cuadradoDesde(const complejo &); //f(z) = z^2
+    const complejo operator/(const complejo &)const;
 
-    void cuboDesde(const complejo &); //f(z) = z^3
+    static const complejo Exp(const complejo &);
 
-    void senoDesde(const complejo &); //f(z) = sin(z)
+    static const complejo Log(const complejo &);
+
+    static const complejo Pow(const complejo &, const complejo &);
 };
 
 #endif
