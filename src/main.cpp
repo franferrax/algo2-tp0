@@ -37,10 +37,10 @@ int main(int argc, char** argv)
 {
 
     /******************* PRUEBA CONVERT RPN **********************/
-    string cadena = "(2 + 3) * 3";
+    string cadena = "(22 + 3) * 3";
     cout << "/******************* PRUEBA CONVERT RPN **********************/"<<endl;
     cout << cadena <<endl;
-    cout << convertToRPN(cadena) << endl;
+    cout << convertToRPN(cadena)->dequeue() << endl;
     /******************* PRUEBA CONVERT RPN **********************/
 
     prog_name = argv[0];
