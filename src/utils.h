@@ -13,9 +13,9 @@
 #include <cstdlib>
 #include "complejo.h"
 #include "cmdline.h"
+#include "queue.h"
+
 using namespace std;
-
-
 
 //////////////////////// Variables globales de main.cpp ////////////////////////
 extern option_t options[];            // Opciones CLA
@@ -72,8 +72,11 @@ size_t getRowFromComplex(const complejo &, size_t);
 size_t getColFromComplex(const complejo &, size_t);
 
 // 9) Conversión a notación polaca inversa
-string convertToRPN(const string &);
-bool isOperator(const char&);
-int precedenceOf(const char&);
+queue<string>* convertToRPN(const string &);
+bool isOperator(const string&);
+int precedenceOf(const string&);
+
+// 10) Calculo y resultado de la operación en notación polaca inversa
+complejo calculateRPN(queue<string>* );
 
 #endif    /* UTILS_H */

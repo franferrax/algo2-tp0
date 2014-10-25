@@ -184,18 +184,19 @@ size_t getColFromComplex(const complejo &z, size_t w)
 /*|/////////////////////////////////|   9)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////| Conversión a notación polaca inversa |\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-string convertToRPN(const string &expr){
+queue<string>* convertToRPN(const string &expr){
 
-    char caux;
-    string result;
-    stack<char> container;
-    bool flagExpectingOperator = false;
+    string caux;
+    //string result;
+    queue<string>* result = new queue<string>();
+    stack<string> container;
+    bool flagExpectingOperator = false, flagExpectingNumber = false;
 
     for (size_t i = 0; i < expr.length(); ++i) {
 
         caux = expr.at(i);
 
-        if (caux==' '){ //vacio. No hago nada
+        if (caux==" "){ //vacio. No hago nada
 
             continue;
 
@@ -215,7 +216,7 @@ string convertToRPN(const string &expr){
              */
             while (!container.isEmpty() && isOperator(container.topElement()) &&
                    precedenceOf(container.topElement()) >= precedenceOf(caux)) {
-                result.append(1u,container.topElement());
+                result->enqueue(container.topElement());
                 container.pop();
             }
 
@@ -224,8 +225,9 @@ string convertToRPN(const string &expr){
 
             //Ya no estamos esperando un operador; que acabamos de encontrar uno
             flagExpectingOperator = false;
+            flagExpectingNumber = false;
 
-        } else if (caux == '(') { //Si el token es un paréntesis abierto, entonces póngalo en la pila.
+        } else if (caux == "(") { //Si el token es un paréntesis abierto, entonces póngalo en la pila.
             //si esperaba un operador
             if (flagExpectingOperator){
                 //devolver algo mas interesante
@@ -233,7 +235,9 @@ string convertToRPN(const string &expr){
                 exit(1);
             }
             container.push(caux);
-        } else if (caux == ')') { //Si el token es un paréntesis derecho
+            
+            flagExpectingNumber = false;
+        } else if (caux == ")") { //Si el token es un paréntesis derecho
             //esto debe aparecer despues de un numero/funcion, no de un operador
             if (!flagExpectingOperator){
                 //devolver algo mas interesante
@@ -243,8 +247,8 @@ string convertToRPN(const string &expr){
 
             /*Hasta que el token en el tope de la pila sea un paréntesis abierto, retire (pop) a los
             operadores de la pila y colóquelos en la cola de salida.*/
-            while (!container.isEmpty() && container.topElement() != '(') {
-                result.append(1u,container.topElement());
+            while (!container.isEmpty() && container.topElement() != "(") {
+                result->enqueue(container.topElement());
                 container.pop();
             }
 
@@ -260,18 +264,25 @@ string convertToRPN(const string &expr){
 
             /* Ahora esperamos un operador */
             flagExpectingOperator = true;
+            flagExpectingNumber = false;
 
         } else { //encuentre un numero
             /* If we're expecting an operator, we're very disappointed. */
-            if (flagExpectingOperator){
+            if (flagExpectingOperator && !flagExpectingNumber){
                 //devolver algo mas interesante
                 cout<<"Se esperaba un operador, se encontró "<<caux<<endl;
                 exit(1);
             }
 
-            //Si el token es un número, entonces agregúelo a la cola de salida
-            result.append(1u,caux);
+            if(flagExpectingNumber){
+                result->frontElement() = result->frontElement() + caux;
+            } else{
+                //Si el token es un número, entonces agregúelo a la cola de salida
+                result->enqueue(caux);
+            }
+            
             flagExpectingOperator = true;
+            flagExpectingNumber = true;
 
         }
     }
@@ -289,11 +300,11 @@ string convertToRPN(const string &expr){
             retire (pop) al operador y póngalo en la cola de salida.
     */
     while (!container.isEmpty()) {
-        if (container.topElement() == '('){
+        if (container.topElement() == "("){
             cout<<"Parentesis desbalanceados"<<endl;
             exit(1);
         }
-        result.append(1u,container.topElement());
+        result->enqueue(container.topElement());
         container.pop();
     }
 
@@ -301,12 +312,52 @@ string convertToRPN(const string &expr){
 
 }
 
-bool isOperator(const char& token) {
-    return token == '+' || token == '-' || token == '*' || token == '/' || token == '%';
+bool isOperator(const string& token) {
+    return token == "+" || token == "-" || token == "*" || token == "/" || token == "%";
 }
 
-int precedenceOf(const char& token) {
-    if (token == '+' || token == '-') return 0;
-    if (token == '*' || token == '/' || token == '%') return 1;
+int precedenceOf(const string& token) {
+    if (token == "+" || token == "-") return 0;
+    if (token == "*" || token == "/" || token == "%") return 1;
+    if (token == "^") return 2;
     return -1;
+}
+
+// 10) 
+/*|/////////////////////////////////|   10)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*|///| Calculo y resultado de la operación en notación polaca inversa |\\\\\|*/
+/*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+complejo calculateRPN(queue<string>* rpn){
+    
+    stack<string> *container = new stack<string>();
+    string caux;
+    double op1, op2, result=0;
+    complejo *complex = new complejo();
+    
+    while(!rpn->isEmpty()){
+        caux = rpn->dequeue();
+        
+        if(isOperator(caux)){ //si es un operador
+            
+            //TODO: estoy suponiendo que los operandos son doubles. Puede ser complejos tal vez?
+            //op1 = atof(container->pop().c_str());
+            //op2 = atof(container->pop().c_str());
+            stringstream arg_stream_op1(container->pop());
+            stringstream arg_stream_op2(container->pop());
+            
+            if(arg_stream_op1 >> op1 && arg_stream_op2 >> op2){
+                //TODO: aplicar la funcion caux a op1 y op2
+            }else{
+                cout<<"Se esperaban operandos en la pila"<<endl;
+                exit(1);
+            }
+            
+        } else{ //sino es un numero
+            container->push(caux);
+        }
+    }
+    
+    complex->SetReal(result);
+    return *complex;
+    
 }
