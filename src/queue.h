@@ -27,6 +27,14 @@ class queue {
 
 };
 
+
+template <class T>
+queue<T>::~queue() {
+
+   while(_first) dequeue();
+
+}
+
 template <class T>
 void queue<T>::enqueue(const T& v){
 
