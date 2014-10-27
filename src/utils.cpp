@@ -74,7 +74,7 @@ void opt_output(const string &arg)
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 void opt_function(const string &arg)
 {
-    // TODO: aquí va el parseo de la expresión en notación infija.
+    rpn_expr = convertToRPN(arg);
 }
 
 
@@ -88,6 +88,7 @@ void opt_region(const string &arg)
     stringstream arg_stream(arg);
     bool errors = true;
 
+    // Lectura de los parámetros, ignorando el separador (',' o cualquier char)
     if (arg_stream >> map_w)
     {
         arg_stream.ignore();
@@ -104,12 +105,16 @@ void opt_region(const string &arg)
                 if (arg_stream >> aux)
                 {
                     map_c.SetImag(aux);
+
+                    // Si se llegó hasta aquí, se pudieron leer los
+                    // 4 parámetros, si hay algo más se ignora
                     errors = false;
                 }
             }
         }
     }
 
+    // Error de lectura, región inválida
     if (errors)
     {
         cerr << "Invalid region description: "
@@ -119,6 +124,7 @@ void opt_region(const string &arg)
         exit(1);
     }
 
+    // Error por ancho o alto no "positivos distintos de cero"
     if (map_w <= 0 || map_h <=0)
     {
         cerr << map_w << "," << map_h
@@ -184,11 +190,10 @@ size_t getColFromComplex(const complejo &z, size_t w)
 /*|/////////////////////////////////|   9)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////| Conversión a notación polaca inversa |\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-queue<string>* convertToRPN(const string &expr){
+queue<string> convertToRPN(const string &expr){
 
     string caux;
-    //string result;
-    queue<string>* result = new queue<string>();
+    queue<string> result;
     stack<string> container;
     bool flagExpectingOperator = false, flagExpectingNumber = false;
 
@@ -216,7 +221,7 @@ queue<string>* convertToRPN(const string &expr){
              */
             while (!container.isEmpty() && isOperator(container.topElement()) &&
                    precedenceOf(container.topElement()) >= precedenceOf(caux)) {
-                result->enqueue(container.topElement());
+                result.enqueue(container.topElement());
                 container.pop();
             }
 
@@ -248,7 +253,7 @@ queue<string>* convertToRPN(const string &expr){
             /*Hasta que el token en el tope de la pila sea un paréntesis abierto, retire (pop) a los
             operadores de la pila y colóquelos en la cola de salida.*/
             while (!container.isEmpty() && container.topElement() != "(") {
-                result->enqueue(container.topElement());
+                result.enqueue(container.topElement());
                 container.pop();
             }
 
@@ -275,10 +280,10 @@ queue<string>* convertToRPN(const string &expr){
             }
 
             if(flagExpectingNumber){
-                result->frontElement() = result->frontElement() + caux;
+                result.frontElement() = result.frontElement() + caux;
             } else{
                 //Si el token es un número, entonces agregúelo a la cola de salida
-                result->enqueue(caux);
+                result.enqueue(caux);
             }
 
             flagExpectingOperator = true;
@@ -304,7 +309,7 @@ queue<string>* convertToRPN(const string &expr){
             cout<<"Parentesis desbalanceados"<<endl;
             exit(1);
         }
-        result->enqueue(container.topElement());
+        result.enqueue(container.topElement());
         container.pop();
     }
 
@@ -333,7 +338,7 @@ complejo calculateRPN(queue<string>* rpn){
     stack<string> *container = new stack<string>();
     string caux;
     double op1, op2, result=0;
-    complejo *complex = new complejo();
+    complejo c;
 
     while(!rpn->isEmpty()){
         caux = rpn->dequeue();
@@ -358,7 +363,7 @@ complejo calculateRPN(queue<string>* rpn){
         }
     }
 
-    complex->SetReal(result);
-    return *complex;
+    c.SetReal(result);
+    return c;
 
 }

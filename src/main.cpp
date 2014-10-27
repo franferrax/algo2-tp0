@@ -27,6 +27,7 @@ double map_w;
 double map_h;
 complejo map_c;
 char *prog_name;
+queue<string> rpn_expr;
 
 
 
@@ -35,19 +36,23 @@ char *prog_name;
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
 int main(int argc, char** argv)
 {
-
-    /******************* PRUEBA CONVERT RPN **********************/
-    string cadena = "(22 + 3) * 3";
-    cout << "/******************* PRUEBA CONVERT RPN **********************/"<<endl;
-    cout << cadena <<endl;
-    cout << convertToRPN(cadena)->dequeue() << endl;
-    /******************* PRUEBA CONVERT RPN **********************/
-
     prog_name = argv[0];
 
     // Validación de argumentos
     cmdline cmdl(options);
     cmdl.parse(argc, argv);
+
+    /******************* PRUEBA CONVERT RPN **********************/
+    #ifdef DEBUG
+    //while(!rpn_expr.isEmpty())
+    //{
+    //    cerr << rpn_expr.dequeue() << " ";
+    //}
+    cerr << rpn_expr.frontElement();
+    cerr << endl;
+    exit(1);
+    #endif
+    /******************* PRUEBA CONVERT RPN **********************/
 
     // Lectura del archivo de entrada
     PGMimage in_image;

@@ -79,12 +79,12 @@ double complejo::GetPha()const {
 
 /* ////////////| Operadores, solo los utilizados, faltan algunos |/////////// */
 
-const complejo complejo::operator+(const complejo &r)const {
-    return complejo (this->x+r.x, this->y+r.y);
+const complejo complejo::operator+(const complejo &c)const {
+    return complejo (this->x + c.x, this->y + c.y);
 }
 
 const complejo complejo::operator+(const double f)const {
-    return complejo (this->x+f, this->y);
+    return complejo (this->x + f, this->y);
 }
 
 void complejo::operator+=(const complejo &c) {
