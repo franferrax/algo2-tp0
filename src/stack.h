@@ -52,7 +52,7 @@ T stack<T>::pop() {
    node<T> *auxNode;
    T v;
 
-   if(!_last) return 0; //pila vacía (TODO: ¿si pila es de otro tipo?)
+   if(!_last) return 0; //pila vacía
 
    auxNode = _last; //primer elemento de la pila
 
@@ -81,4 +81,3 @@ T& stack<T>::topElement() {
 }
 
 #endif	/* STACK_H */
-

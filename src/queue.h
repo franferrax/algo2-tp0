@@ -78,4 +78,3 @@ T& queue<T>::frontElement(){
 }
 
 #endif	/* QUEUE_H */
-

@@ -101,12 +101,13 @@ void complejo::operator-=(const complejo &c) {
     this->y -= c.y;
 }
 
+// (a+bi)(c+di) = ac-bd + (ad+bc)i
 const complejo complejo::operator*(const complejo &c)const {
     return complejo ( this->x * c.x - this->y * c.y,
                       this->x * c.y + this->y * c.x );
 }
 
-//
+// (a+bi)/(c+di) = ( ac+bd + (bc-ad)i ) / ( b^2 + d^2 )
 const complejo complejo::operator/(const complejo &c)const {
     double aux = c.x*c.x + c.y*c.y;
 

@@ -44,27 +44,27 @@ $(BIN_DIR):
 	mkdir $(BIN_DIR)
 
     # -------------------------- Dependencias ---------------------------- #
-$(BIN_DIR)/PGMimage.o: | $(BIN_DIR) $(addprefix $(SRC_DIR)/, \
+$(BIN_DIR)/PGMimage.o: $(addprefix $(SRC_DIR)/, \
     PGMimage.cpp \
     PGMimage.h   \
-)
+) | $(BIN_DIR)
 
-$(BIN_DIR)/complejo.o: | $(BIN_DIR) $(addprefix $(SRC_DIR)/, \
+$(BIN_DIR)/complejo.o: $(addprefix $(SRC_DIR)/, \
     complejo.cpp \
     complejo.h   \
-)
+) | $(BIN_DIR)
 
-$(BIN_DIR)/utils.o:    | $(BIN_DIR) $(addprefix $(SRC_DIR)/, \
+$(BIN_DIR)/utils.o: $(addprefix $(SRC_DIR)/, \
     utils.cpp    \
     utils.h      \
-)
+) | $(BIN_DIR)
 
-$(BIN_DIR)/cmdline.o:  | $(BIN_DIR) $(addprefix $(SRC_DIR)/, \
+$(BIN_DIR)/cmdline.o: $(addprefix $(SRC_DIR)/, \
     cmdline.cpp  \
     cmdline.h    \
-)
+) | $(BIN_DIR)
 
-$(BIN_DIR)/main.o:     | $(BIN_DIR) $(addprefix $(SRC_DIR)/, \
+$(BIN_DIR)/main.o: $(addprefix $(SRC_DIR)/, \
     main.cpp     \
     PGMimage.h   \
     complejo.h   \
@@ -73,7 +73,7 @@ $(BIN_DIR)/main.o:     | $(BIN_DIR) $(addprefix $(SRC_DIR)/, \
     node.h       \
     queue.h      \
     stack.h      \
-)
+) | $(BIN_DIR)
 
 
 

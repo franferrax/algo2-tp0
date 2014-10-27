@@ -138,7 +138,7 @@ void opt_help(const string &arg)
 {
     cout << "Usage: "
          << prog_name
-         << " [-i file] [-o file] [-r w,h,x0,y0] [-f function]"
+         << " [-i file] [-o file] [-r w,h,x0,y0] [-f expression(z)]"
          << endl;
     exit(0);
 }
@@ -235,7 +235,7 @@ queue<string>* convertToRPN(const string &expr){
                 exit(1);
             }
             container.push(caux);
-            
+
             flagExpectingNumber = false;
         } else if (caux == ")") { //Si el token es un paréntesis derecho
             //esto debe aparecer despues de un numero/funcion, no de un operador
@@ -280,7 +280,7 @@ queue<string>* convertToRPN(const string &expr){
                 //Si el token es un número, entonces agregúelo a la cola de salida
                 result->enqueue(caux);
             }
-            
+
             flagExpectingOperator = true;
             flagExpectingNumber = true;
 
@@ -323,41 +323,42 @@ int precedenceOf(const string& token) {
     return -1;
 }
 
-// 10) 
-/*|/////////////////////////////////|   10)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-/*|///| Calculo y resultado de la operación en notación polaca inversa |\\\\\|*/
+
+
+/*|/////////////////////////////////|  10)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*|////| Cálculo y resultado de la operación en notación polaca inversa |\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 complejo calculateRPN(queue<string>* rpn){
-    
+
     stack<string> *container = new stack<string>();
     string caux;
     double op1, op2, result=0;
     complejo *complex = new complejo();
-    
+
     while(!rpn->isEmpty()){
         caux = rpn->dequeue();
-        
+
         if(isOperator(caux)){ //si es un operador
-            
+
             //TODO: estoy suponiendo que los operandos son doubles. Puede ser complejos tal vez?
             //op1 = atof(container->pop().c_str());
             //op2 = atof(container->pop().c_str());
             stringstream arg_stream_op1(container->pop());
             stringstream arg_stream_op2(container->pop());
-            
+
             if(arg_stream_op1 >> op1 && arg_stream_op2 >> op2){
                 //TODO: aplicar la funcion caux a op1 y op2
             }else{
                 cout<<"Se esperaban operandos en la pila"<<endl;
                 exit(1);
             }
-            
+
         } else{ //sino es un numero
             container->push(caux);
         }
     }
-    
+
     complex->SetReal(result);
     return *complex;
-    
+
 }
