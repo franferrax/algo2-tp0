@@ -74,7 +74,7 @@ void opt_output(const string &arg)
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 void opt_function(const string &arg)
 {
-    rpn_expr = convertToRPN(arg);
+    convertToRPN(rpn_expr,arg);
 }
 
 
@@ -190,16 +190,17 @@ size_t getColFromComplex(const complejo &z, size_t w)
 /*|/////////////////////////////////|   9)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////| Conversión a notación polaca inversa |\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-queue<string> convertToRPN(const string &expr){
+void convertToRPN(queue<string> &result,const string &expr){
 
-    string caux;
-    queue<string> result;
+    string caux, var;
+    double aux;
     stack<string> container;
-    bool flagExpectingOperator = false, flagExpectingNumber = false;
+    bool flagExpectingOperator = false, flagExpectingNumber = false, flagExpectingFunction = false;
 
     for (size_t i = 0; i < expr.length(); ++i) {
-
+        
         caux = expr.at(i);
+        stringstream arg_stream_number(caux);
 
         if (caux==" "){ //vacio. No hago nada
 
@@ -221,7 +222,8 @@ queue<string> convertToRPN(const string &expr){
              */
             while (!container.isEmpty() && isOperator(container.topElement()) &&
                    precedenceOf(container.topElement()) >= precedenceOf(caux)) {
-                result.enqueue(container.topElement());
+                var = container.topElement();
+                result.enqueue(var);
                 container.pop();
             }
 
@@ -231,8 +233,9 @@ queue<string> convertToRPN(const string &expr){
             //Ya no estamos esperando un operador; que acabamos de encontrar uno
             flagExpectingOperator = false;
             flagExpectingNumber = false;
+            flagExpectingFunction = false;
 
-        } else if (caux == "(") { //Si el token es un paréntesis abierto, entonces póngalo en la pila.
+        } else if (caux == "(" && !flagExpectingFunction) { //Si el token es un paréntesis abierto, entonces póngalo en la pila.
             //si esperaba un operador
             if (flagExpectingOperator){
                 //devolver algo mas interesante
@@ -242,7 +245,8 @@ queue<string> convertToRPN(const string &expr){
             container.push(caux);
 
             flagExpectingNumber = false;
-        } else if (caux == ")") { //Si el token es un paréntesis derecho
+            flagExpectingFunction = false;
+        } else if (caux == ")" && !flagExpectingFunction) { //Si el token es un paréntesis derecho
             //esto debe aparecer despues de un numero/funcion, no de un operador
             if (!flagExpectingOperator){
                 //devolver algo mas interesante
@@ -253,7 +257,8 @@ queue<string> convertToRPN(const string &expr){
             /*Hasta que el token en el tope de la pila sea un paréntesis abierto, retire (pop) a los
             operadores de la pila y colóquelos en la cola de salida.*/
             while (!container.isEmpty() && container.topElement() != "(") {
-                result.enqueue(container.topElement());
+                var = container.topElement();
+                result.enqueue(var);
                 container.pop();
             }
 
@@ -270,8 +275,9 @@ queue<string> convertToRPN(const string &expr){
             /* Ahora esperamos un operador */
             flagExpectingOperator = true;
             flagExpectingNumber = false;
+            flagExpectingFunction = false;
 
-        } else { //encuentre un numero
+        } else if((arg_stream_number >> aux) || caux == "i") { //encuentre un numero
             /* If we're expecting an operator, we're very disappointed. */
             if (flagExpectingOperator && !flagExpectingNumber){
                 //devolver algo mas interesante
@@ -288,7 +294,45 @@ queue<string> convertToRPN(const string &expr){
 
             flagExpectingOperator = true;
             flagExpectingNumber = true;
+            flagExpectingFunction = false;
 
+        } else if(caux == "z" && !flagExpectingFunction){ //encontre una z
+            
+            if (flagExpectingOperator){
+                //devolver algo mas interesante
+                cout<<"Esperabamos un operador, no una z"<<endl;
+                exit(1);
+            }
+            
+            result.enqueue(caux);
+            
+            flagExpectingOperator = true;
+            flagExpectingNumber = false;
+            flagExpectingFunction = false;
+            
+        } else if(flagExpectingFunction || isPartOfFunction(caux) ){ //si espero una parte de la funcion o es una funcion
+            
+            if(flagExpectingFunction){
+                result.frontElement() = result.frontElement() + caux;
+            } else if(isPartOfFunction(caux)){
+                result.enqueue(caux);
+            }
+            
+            if(isFunction(result.frontElement())){ //si es una funcion, espero un operador
+                flagExpectingOperator = true;
+                flagExpectingNumber = false;
+                flagExpectingFunction = false;
+            } else{ //sino espero una funcion
+                flagExpectingOperator = false;
+                flagExpectingNumber = false;
+                flagExpectingFunction = true;
+            }
+            
+        } else{
+            
+            cout<<"Carácter no reconocido: "<<caux<<endl;
+            exit(1);
+            
         }
     }
 
@@ -309,16 +353,49 @@ queue<string> convertToRPN(const string &expr){
             cout<<"Parentesis desbalanceados"<<endl;
             exit(1);
         }
-        result.enqueue(container.topElement());
+        var = container.topElement();
+        result.enqueue(var);
         container.pop();
     }
 
-    return result;
+    //return result;
 
 }
 
 bool isOperator(const string& token) {
     return token == "+" || token == "-" || token == "*" || token == "/" || token == "%";
+}
+
+bool isPartOfFunction(const string& token) {
+    
+    size_t length = (sizeof(special_tokens)/sizeof(*special_tokens));
+    for(size_t i=0 ; i < length ;i++ ){
+        
+        if(special_tokens[i].find(token) == 0){
+            
+            return true;
+            
+        }
+    }
+    
+    return false;
+    
+}
+
+bool isFunction(const string& token) {
+    
+    size_t length = (sizeof(special_tokens)/sizeof(*special_tokens));
+    for(size_t i=0 ; i < length ;i++ ){
+        
+        if(special_tokens[i].compare(token) == 0){
+            
+            return true;
+            
+        }
+    }
+    
+    return false;
+    
 }
 
 int precedenceOf(const string& token) {

@@ -33,12 +33,12 @@ extern queue<string> rpn_expr;        // Expresión convertida a RPN
 /////////////////// Configuraciones de la función a aplicar ////////////////////
 static const string special_tokens[] = // Funciones a interpretar
 {
-    "exp",
-    "ln",
-    "re",
-    "im",
-    "abs",
-    "phase",
+    "exp(z)",
+    "ln(z)",
+    "re(z)",
+    "im(z)",
+    "abs(z)",
+    "phase(z)",
     "" // No olvidar centinela de cadena vacía
 };
 
@@ -73,9 +73,11 @@ size_t getRowFromComplex(const complejo &, size_t);
 size_t getColFromComplex(const complejo &, size_t);
 
 // 9) Conversión a notación polaca inversa
-queue<string> convertToRPN(const string &);
+void convertToRPN(queue<string> &, const string &);
 bool isOperator(const string&);
 int precedenceOf(const string&);
+bool isPartOfFunction(const string& );
+bool isFunction(const string& );
 
 // 10) Calculo y resultado de la operación en notación polaca inversa
 complejo calculateRPN(queue<string> *);
