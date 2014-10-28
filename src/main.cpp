@@ -43,16 +43,14 @@ int main(int argc, char** argv)
     cmdl.parse(argc, argv);
 
     /******************* PRUEBA CONVERT RPN **********************/
-    //#ifdef DEBUG
-    
+    #ifdef DEBUG
     while(!rpn_expr.isEmpty())
     {
         cout << rpn_expr.dequeue() << " ";
     }
-    //cout << rpn_expr.frontElement();
     cout << endl;
     exit(1);
-    //#endif
+    #endif
     /******************* PRUEBA CONVERT RPN **********************/
 
     // Lectura del archivo de entrada
