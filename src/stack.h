@@ -52,7 +52,7 @@ T stack<T>::pop() {
    node<T> *auxNode;
    T v;
 
-   if(!_last) return 0; //pila vacía
+   if(!_last) return T(); //pila vacía
 
    auxNode = _last; //primer elemento de la pila
 

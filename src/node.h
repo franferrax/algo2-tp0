@@ -8,7 +8,7 @@
 #ifndef NODE_H
 #define	NODE_H
 
-// Clases que utilizarán la clase nodo
+// Clases que utilizarán a la clase nodo
 template <class T> class queue;
 template <class T> class stack;
 
@@ -17,7 +17,7 @@ template <class T>
 class node {
 
     public:
-        node(T , node<T> * );
+        node(const T &, node<T> *);
 
     private:
         T _value;
@@ -28,7 +28,7 @@ class node {
 };
 
 template <class T>
-node<T>::node(T v, node<T> *nxt = NULL) {
+node<T>::node(const T& v, node<T> *nxt = NULL) {
     _value = v;
     _next = nxt;
 }

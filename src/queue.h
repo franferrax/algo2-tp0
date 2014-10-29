@@ -39,14 +39,16 @@ template <class T>
 void queue<T>::enqueue(const T& v){
 
     node<T> *newNode;
-    
-    newNode = new node<T>(v); //creamos un nuevo auxNode
-    
-    if(_last) _last->_next = newNode;// Si la cola no estaba vacía, añadimos el nuevo a continuación de ultimo
+
+    newNode = new node<T>(v); // creamos un nuevo auxNode
+
+    // Si la cola no estaba vacía, añadimos el nuevo a continuación del último
+    if(_last) _last->_next = newNode;
 
     _last = newNode; // Ahora, el último elemento de la cola es el nuevo auxNode
 
-    if(!_first) _first = newNode; // Si la cola estaba vacía, ahora primero apunta al nuevo auxNode
+    // Si la cola estaba vacía, ahora el primero también es el nuevo auxNode
+    if(!_first) _first = newNode;
 
 }
 
@@ -62,11 +64,12 @@ T queue<T>::dequeue(){
     _first = auxNode->_next; //asignamos al primero el segundo nodo
 
     v = auxNode->_value;
-    
+
     delete auxNode;
 
-    if(!_first) _last = NULL;//si la cola quedó vacía, ultimo debe ser NULL también
-    
+    //si la cola quedó vacía, ultimo debe ser NULL también
+    if(!_first) _last = NULL;
+
     return v;
 
 }
@@ -81,7 +84,7 @@ bool queue<T>::isEmpty() const{
 template <class T>
 T& queue<T>::frontElement(){
 
-    return _last->_value;
+    return _first->_value;
 
 }
 
