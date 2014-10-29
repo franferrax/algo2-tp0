@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
+#include <limits>
 #include "queue.h"
 
 using namespace std;
@@ -59,6 +60,10 @@ public:
 #define is_operator(s)    ( find_in_list(operator_tokens, s) )
 #define is_special(s)     ( find_in_list(special_tokens,  s) )
 #define is_function(s)    ( find_in_list(function_tokens, s) )
+
+// Not a number para doubles
+#define NAN (numeric_limits<double>::quiet_NaN())
+
 
 // Funciones a interpretar
 static const string function_tokens[] =
