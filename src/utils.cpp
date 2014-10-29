@@ -74,7 +74,15 @@ void opt_output(const string &arg)
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 void opt_function(const string &arg)
 {
-    convertToRPN(rpn_expr, arg);
+    queue<token> tokenized_expr;
+
+#ifdef DEBUG
+    parse_expression_in_tokens(arg, rpn_expr);
+#else
+    parse_expression_in_tokens(arg, tokenized_expr);
+    convertToRPN(rpn_expr, tokenized_expr);
+#endif
+
 }
 
 

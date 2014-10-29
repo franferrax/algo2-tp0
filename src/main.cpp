@@ -27,7 +27,7 @@ double map_w;
 double map_h;
 complejo map_c;
 char *prog_name;
-queue<string> rpn_expr;
+queue<token> rpn_expr;
 
 
 
@@ -43,12 +43,12 @@ int main(int argc, char** argv)
     cmdl.parse(argc, argv);
 
     /******************* PRUEBA CONVERT RPN **********************/
+    // Prueba del parseo y limpieza de entrada
     #ifdef DEBUG
     while(!rpn_expr.isEmpty())
     {
-        cout << rpn_expr.dequeue() << " ";
+        cout << rpn_expr.dequeue() << endl;
     }
-    cout << endl;
     exit(1);
     #endif
     /******************* PRUEBA CONVERT RPN **********************/

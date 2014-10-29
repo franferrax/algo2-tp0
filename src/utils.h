@@ -14,6 +14,7 @@
 #include "complejo.h"
 #include "cmdline.h"
 #include "queue.h"
+#include "parser.h"
 
 using namespace std;
 
@@ -27,20 +28,7 @@ extern char *prog_name;               // Nombre del programa
 extern double map_w;                  // Ancho de la región de mapeo
 extern double map_h;                  // Alto de la región de mapeo
 extern complejo map_c;                // Centro de la región de mapeo
-extern queue<string> rpn_expr;        // Expresión convertida a RPN
-
-
-/////////////////// Configuraciones de la función a aplicar ////////////////////
-static const string special_tokens[] = // Funciones a interpretar
-{
-    "exp(z)",
-    "ln(z)",
-    "re(z)",
-    "im(z)",
-    "abs(z)",
-    "phase(z)",
-    "" // No olvidar centinela de cadena vacía
-};
+extern queue<token> rpn_expr;         // Expresión convertida a RPN
 
 
 

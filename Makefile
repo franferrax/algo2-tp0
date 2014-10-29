@@ -29,6 +29,7 @@ OBJECTS = $(addprefix $(BIN_DIR)/, \
     complejo.o   \
     utils.o      \
     cmdline.o    \
+    parser.o     \
     main.o       \
 )
 FULL_OUT = $(BIN_DIR)/$(OUT)
@@ -64,6 +65,11 @@ $(BIN_DIR)/cmdline.o: $(addprefix $(SRC_DIR)/, \
     cmdline.h    \
 ) | $(BIN_DIR)
 
+$(BIN_DIR)/parser.o: $(addprefix $(SRC_DIR)/, \
+    parser.cpp  \
+    parser.h    \
+) | $(BIN_DIR)
+
 $(BIN_DIR)/main.o: $(addprefix $(SRC_DIR)/, \
     main.cpp     \
     PGMimage.h   \
@@ -73,6 +79,7 @@ $(BIN_DIR)/main.o: $(addprefix $(SRC_DIR)/, \
     node.h       \
     queue.h      \
     stack.h      \
+    parser.h     \
 ) | $(BIN_DIR)
 
 
