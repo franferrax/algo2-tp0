@@ -28,7 +28,7 @@ extern char *prog_name;               // Nombre del programa
 extern double map_w;                  // Ancho de la región de mapeo
 extern double map_h;                  // Alto de la región de mapeo
 extern complejo map_c;                // Centro de la región de mapeo
-extern queue<token> rpn_expr;         // Expresión convertida a RPN
+extern queue<string> rpn_expr;         // Expresión convertida a RPN
 
 
 
@@ -61,10 +61,10 @@ size_t getRowFromComplex(const complejo &, size_t);
 size_t getColFromComplex(const complejo &, size_t);
 
 // 9) Conversión a notación polaca inversa
-void convertToRPN(queue<string> &, const string &);
+void convertToRPN(queue<string> &, queue<token> &);
 bool isOperator(const string&);
 int precedenceOf(const string&);
-bool isPartOfFunction(const string& );
+//bool isPartOfFunction(const string& );
 bool isFunction(const string& );
 
 // 10) Calculo y resultado de la operación en notación polaca inversa

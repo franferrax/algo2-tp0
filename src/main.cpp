@@ -27,7 +27,7 @@ double map_w;
 double map_h;
 complejo map_c;
 char *prog_name;
-queue<token> rpn_expr;
+queue<string> rpn_expr;
 
 
 
