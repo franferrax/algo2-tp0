@@ -10,7 +10,7 @@
 using namespace std;
 
 ////////////////////////////// Variables globales //////////////////////////////
-option_t options[] =
+option_t options[] =           // Opciones CLA
 {
     {true,  "i", "input",    "-",       opt_input,    OPT_DEFAULT},
     {true,  "o", "output",   "-",       opt_output,   OPT_DEFAULT},
@@ -19,15 +19,15 @@ option_t options[] =
     {false, "h", "help",     NULL,      opt_help,     OPT_DEFAULT},
     {0, },
 };
-istream *iss = NULL;
-ostream *oss = NULL;
-fstream ifs;
-fstream ofs;
-double map_w;
-double map_h;
-complejo map_c;
-char *prog_name;
-queue<token> rpn_expr;
+istream *iss = NULL;           // Puntero a stream de entrada
+ostream *oss = NULL;           // Puntero a stream de salida
+fstream ifs;                   // Archivo de entrada
+fstream ofs;                   // Archivo de salida
+char *prog_name;               // Nombre del programa
+double map_w;                  // Ancho de la región de mapeo
+double map_h;                  // Alto de la región de mapeo
+complejo map_c;                // Centro de la región de mapeo
+queue<token> rpn_expr;         // Expresión convertida a RPN
 
 
 
@@ -47,8 +47,9 @@ int main(int argc, char** argv)
     #ifdef DEBUG
     while(!rpn_expr.isEmpty())
     {
-        cout << rpn_expr.dequeue() << endl;
+        cout << rpn_expr.dequeue() << " ";
     }
+    cout << endl;
     exit(1);
     #endif
     /******************* PRUEBA CONVERT RPN **********************/

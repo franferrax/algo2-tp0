@@ -78,6 +78,20 @@ bool token::isParenthesis() const
     return is_parenthesis(this->_s);
 }
 
+// ¿Es un paréntesis abierto?
+bool token::isOpenParenthesis() const
+{
+    if (this->isValue()) return false;
+    return this->_s == "(";
+}
+
+// ¿Es un paréntesis cerrado?
+bool token::isClosedParenthesis() const
+{
+    if (this->isValue()) return false;
+    return this->_s == ")";
+}
+
 // ¿Es un operador?
 bool token::isOperator() const
 {
@@ -122,13 +136,13 @@ ostream & operator<<(ostream &os, const token &t)
 /*|/////////////////////////////////|   1)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|////| Función para buscar en una lista con centinela de cadena vacía |\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-bool find_in_list(const string l[], const string &s)
+int find_in_list(const string l[], const string &s)
 {
     for (size_t i = 0; !l[i].empty(); i++)
         if (l[i] == s)
-            return true;
+            return i; // Si lo encuentra devuelve su posición
 
-    return false;
+    return NOT_FOUND; // Si no lo encuentra se devuelve NOT_FOUND
 }
 
 
@@ -156,7 +170,7 @@ void parse_expression_in_tokens(const string &input, queue<token> &output)
         }
 
         // Si es el comienzo de un número, se intenta leerlo
-        if ( number_start(aux_s) )
+        if ( is_number_start(aux_s) )
         {
             // Si no se logra, se sale con un error
             if ( !(expr >> aux_n) )
@@ -173,6 +187,11 @@ void parse_expression_in_tokens(const string &input, queue<token> &output)
         // Si no, puede tratarse de un operador o un paréntesis
         else if ( is_operator(aux_s) || is_parenthesis(aux_s) )
         {
+            // Caso especial, "-" como operador unario, se agrega un 0
+            if ( aux_s == "-" &&
+                 (output.isEmpty() || output.lastAdded().isOpenParenthesis()) )
+                output.enqueue(token(0));
+
             expr.ignore();
             output.enqueue(token(aux_s));
         }

@@ -62,9 +62,9 @@ size_t getColFromComplex(const complejo &, size_t);
 
 // 9) Conversión a notación polaca inversa
 void convertToRPN(queue<token> &, queue<token> &);
-bool isOperator(const string&);
-int precedenceOf(const string&);
-bool isFunction(const string& );
+int precedenceOf(const string &);
+void errorHandlerUnexpectedToken(const token &);
+void errorHandlerMismatchedParentheses();
 
 // 10) Calculo y resultado de la operación en notación polaca inversa
 complejo calculateRPN(queue<string> *);

@@ -191,223 +191,28 @@ size_t getColFromComplex(const complejo &z, size_t w)
 }
 
 
-//
-///*|/////////////////////////////////|   9)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-///*|/////////////////| Conversión a notación polaca inversa |\\\\\\\\\\\\\\\\\|*/
-///*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-//void convertToRPN1(queue<string> &result,const string &expr){
-//
-//    string caux, var;
-//    double aux;
-//    stack<string> container;
-//    bool flagExpectingOperator = false;
-//    bool flagExpectingNumber = false;
-//    bool flagExpectingFunction = false;
-//
-//    for (size_t i = 0; i < expr.length(); ++i) {
-//
-//        caux = expr.at(i);
-//        stringstream arg_stream_number(caux);
-//
-//        if (caux==" "){ //vacio. No hago nada
-//
-//            continue;
-//
-//        //Si el token es un operador, o1, entonces:
-//        } else if (isOperator(caux)){
-//
-//            if (!flagExpectingOperator){
-//                //devolver algo mas interesante
-//                cout<<"Error de parametro"<<endl;
-//                exit(1);
-//            }
-//
-//            /*
-//            mientras que haya un operador, o2, en el tope de la pila (esto
-//            excluye el paréntesis abierto), y
-//                * o1 es asociativo izquierdo y su precedencia es menor que (una
-//                precedencia más baja) o igual a la de o2, ó
-//                * o1 es asociativo derecho y su precedencia es menor que (una
-//                precedencia más baja) que la de o2,
-//            retire (pop) de la pila el o2, y póngalo en la cola de salida.
-//            */
-//            while (!container.isEmpty() && isOperator(container.topElement()) &&
-//                   precedenceOf(container.topElement()) >= precedenceOf(caux)) {
-//                var = container.topElement();
-//                result.enqueue(var);
-//                container.pop();
-//            }
-//
-//            //ponga (push) o1 en el tope de la pila.
-//            container.push(caux);
-//
-//            //Ya no estamos esperando un operador; que acabamos de encontrar uno
-//            flagExpectingOperator = false;
-//            flagExpectingNumber = false;
-//            flagExpectingFunction = false;
-//
-//        //Si el token es un paréntesis abierto, entonces póngalo en la pila.
-//        } else if (caux == "(" && !flagExpectingFunction) {
-//            //si esperaba un operador
-//            if (flagExpectingOperator){
-//                //devolver algo mas interesante
-//                cout<<"Esperabamos un operador, no un parentesis ("<<endl;
-//                exit(1);
-//            }
-//            container.push(caux);
-//
-//            flagExpectingNumber = false;
-//            flagExpectingFunction = false;
-//        //Si el token es un paréntesis derecho
-//        } else if (caux == ")" && !flagExpectingFunction) {
-//            //esto debe aparecer despues de un numero/función, no de un operador
-//            if (!flagExpectingOperator){
-//                //devolver algo mas interesante
-//                cout<<"Esperabamos un valor, no un parentesis )"<<endl;
-//                exit(1);
-//            }
-//
-//            /*Hasta que el token en el tope de la pila sea un paréntesis
-//            abierto, retire (pop) a los operadores de la pila y colóquelos
-//            en la cola de salida.*/
-//            while (!container.isEmpty() && container.topElement() != "(") {
-//                var = container.topElement();
-//                result.enqueue(var);
-//                container.pop();
-//            }
-//
-//            //Si la pila se termina sin encontrar un paréntesis abierto,
-//            //entonces hay paréntesis sin pareja.
-//            if (container.isEmpty()){
-//                //devolver algo mas interesante
-//                cout<<"Falta un parentesis"<<endl;
-//                exit(1);
-//            }
-//
-//            //Retire (pop) el paréntesis abierto de la pila,
-//            //pero no lo ponga en la cola de salida.
-//            container.pop();
-//
-//            /* Ahora esperamos un operador */
-//            flagExpectingOperator = true;
-//            flagExpectingNumber = false;
-//            flagExpectingFunction = false;
-//
-//        //encuentre un numero
-//        } else if((arg_stream_number >> aux) || caux == "i") {
-//            /* If we're expecting an operator, we're very disappointed. */
-//            if (flagExpectingOperator && !flagExpectingNumber){
-//                //devolver algo mas interesante
-//                cout<<"Se esperaba un operador, se encontró "<<caux<<endl;
-//                exit(1);
-//            }
-//
-//            if(flagExpectingNumber){
-//                result.frontElement() += caux;
-//            } else{
-//                //Si el token es un número, se agrega a la cola de salida
-//                result.enqueue(caux);
-//            }
-//
-//            flagExpectingOperator = true;
-//            flagExpectingNumber = true;
-//            flagExpectingFunction = false;
-//
-//        } else if(caux == "z" && !flagExpectingFunction){ //encontré una z
-//
-//            if (flagExpectingOperator){
-//                //devolver algo mas interesante
-//                cout<<"Esperabamos un operador, no una z"<<endl;
-//                exit(1);
-//            }
-//
-//            result.enqueue(caux);
-//
-//            flagExpectingOperator = true;
-//            flagExpectingNumber = false;
-//            flagExpectingFunction = false;
-//
-//        //si espero una parte de la función o es una función
-//        } else if(flagExpectingFunction || isPartOfFunction(caux) ){
-//
-//            if(flagExpectingFunction){
-//                result.frontElement() = result.frontElement() + caux;
-//            } else if(isPartOfFunction(caux)){
-//                result.enqueue(caux);
-//            }
-//
-//            //si es una función, espero un operador
-//            if(isFunction(result.frontElement())){
-//                flagExpectingOperator = true;
-//                flagExpectingNumber = false;
-//                flagExpectingFunction = false;
-//            //sino espero una funcion
-//            } else{
-//                flagExpectingOperator = false;
-//                flagExpectingNumber = false;
-//                flagExpectingFunction = true;
-//            }
-//
-//        } else{
-//
-//            cout<<"Carácter no reconocido: "<<caux<<endl;
-//            exit(1);
-//
-//        }
-//    }
-//
-//    //ya se parseó todo el string. Esperamos un operador
-//    //ya que lo ultimo fue un valor
-//    if (!flagExpectingOperator){
-//        cout<<"Se esperaba un valor"<<endl;
-//        exit(1);
-//    }
-//
-//    /*
-//    Cuando no hay más tokens para leer:
-//        Mientras todavía haya tokens de operadores en la pila:
-//            Si el token del operador en el tope de la pila es un paréntesis,
-//            entonces hay paréntesis sin la pareja correspondiente.
-//            retire (pop) al operador y póngalo en la cola de salida.
-//    */
-//    while (!container.isEmpty()) {
-//        if (container.topElement() == "("){
-//            cout<<"Parentesis desbalanceados"<<endl;
-//            exit(1);
-//        }
-//        var = container.topElement();
-//        result.enqueue(var);
-//        container.pop();
-//    }
-//
-//    //return result;
-//
-//}
 
 /*|/////////////////////////////////|   9)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////| Conversión a notación polaca inversa |\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 void convertToRPN(queue<token> &result, queue<token> &tokens){
 
-    token caracter, var;
+    token tok, var;
     stack<token> container;
-    
+
     bool flagExpectingOperator = false;
     bool flagExpectingNumber = false;
     bool flagExpectingFunction = true;
-    
+
     while(!tokens.isEmpty()) {
 
-        caracter = tokens.dequeue();
-        
+        tok = tokens.dequeue();
+
         //Si el token es un operador, o1, entonces:
-        if(caracter.isOperator()){
-            
-            if (!flagExpectingOperator){
-                //devolver algo mas interesante
-                cout<<"Error de parametro"<<endl;
-                exit(1);
-            }
+        if(tok.isOperator()){
+
+            if (!flagExpectingOperator)
+                errorHandlerUnexpectedToken(tok);
 
             /*
             mientras que haya un operador, o2, en el tope de la pila (esto
@@ -418,69 +223,65 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
                 precedencia más baja) que la de o2,
             retire (pop) de la pila el o2, y póngalo en la cola de salida.
             */
-            while (!container.isEmpty() && (container.topElement().isOperator() || container.topElement().isFunction()) &&
-                   precedenceOf(container.topElement().getAsString()) >= precedenceOf(caracter.getAsString())) {
+            while ( !container.isEmpty() &&
+                    (container.topElement().isOperator() ||
+                     container.topElement().isFunction()) &&
+                    precedenceOf(container.topElement().getAsString()) >=
+                    precedenceOf(tok.getAsString()) ) {
                 var = container.topElement();
                 result.enqueue(var);
                 container.pop();
             }
 
             //ponga (push) o1 en el tope de la pila.
-            container.push(caracter);
-            
+            container.push(tok);
+
             flagExpectingOperator = false;
             flagExpectingFunction = true;
             flagExpectingNumber = true;
-            
 
 
-        } else if(caracter.isFunction()){
-            
-            if (!flagExpectingFunction){
-                //devolver algo mas interesante
-                cout<<"Error de parametro"<<endl;
-                exit(1);
-            }
-            
-            while (!container.isEmpty() && container.topElement().isOperator() &&
-                   precedenceOf(container.topElement().getAsString()) >= precedenceOf(caracter.getAsString())) {
+        } else if(tok.isFunction()){
+
+            if (!flagExpectingFunction)
+                errorHandlerUnexpectedToken(tok);
+
+            while ( !container.isEmpty() && container.topElement().isOperator()
+                    && precedenceOf(container.topElement().getAsString()) >=
+                       precedenceOf(tok.getAsString()) ) {
                 var = container.topElement();
                 result.enqueue(var);
                 container.pop();
             }
 
             //ponga (push) o1 en el tope de la pila.
-            container.push(caracter);
-            
+            container.push(tok);
+
             flagExpectingOperator = false;
             flagExpectingFunction = false;
             flagExpectingNumber = false;
-            
+
         //Si el token es un paréntesis abierto, entonces póngalo en la pila.
-        } else if (caracter.getAsString() == "(") {
+        } else if (tok.isOpenParenthesis()) {
             //si esperaba un operador
-            if (flagExpectingOperator){
-                //devolver algo mas interesante
-                cout<<"Esperabamos un operador, no un parentesis ("<<endl;
-                exit(1);
-            }
-            container.push(caracter);
+            if (flagExpectingOperator)
+                errorHandlerUnexpectedToken(tok);
+
+            container.push(tok);
 
             flagExpectingNumber = false;
 
         //Si el token es un paréntesis derecho
-        } else if (caracter.getAsString() == ")") {
-            //esto debe aparecer despues de un numero/función, no de un operador
-            if (!flagExpectingOperator){
-                //devolver algo mas interesante
-                cout<<"Esperabamos un valor, no un parentesis )"<<endl;
-                exit(1);
-            }
+        } else if (tok.isClosedParenthesis()) {
+            //esto debe aparecer después de un numero/función, no de un operador
+            if (!flagExpectingOperator)
+                errorHandlerUnexpectedToken(tok);
 
             /*Hasta que el token en el tope de la pila sea un paréntesis
             abierto, retire (pop) a los operadores de la pila y colóquelos
             en la cola de salida.*/
-            while (!container.isEmpty() && container.topElement().getAsString() != "(") {
+            while (!container.isEmpty() &&
+                    !container.topElement().isOpenParenthesis()) {
                 var = container.topElement();
                 result.enqueue(var);
                 container.pop();
@@ -488,11 +289,8 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
 
             //Si la pila se termina sin encontrar un paréntesis abierto,
             //entonces hay paréntesis sin pareja.
-            if (container.isEmpty()){
-                //devolver algo mas interesante
-                cout<<"Falta un parentesis"<<endl;
-                exit(1);
-            }
+            if (container.isEmpty())
+                errorHandlerMismatchedParentheses();
 
             //Retire (pop) el paréntesis abierto de la pila,
             //pero no lo ponga en la cola de salida.
@@ -504,35 +302,31 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
             flagExpectingNumber = false;
 
         //encuentre un numero
-        } else if(caracter.isValue() || caracter.isSpecial()) {
+        } else if(tok.isValue() || tok.isSpecial()) {
             /* If we're expecting an operator, we're very disappointed. */
-            if (flagExpectingOperator && !flagExpectingNumber){
-                //devolver algo mas interesante
-                cout<<"Se esperaba un operador, se encontró "<<caracter.getAsString()<<endl;
-                exit(1);
-            }
+            if (flagExpectingOperator && !flagExpectingNumber)
+                errorHandlerUnexpectedToken(tok);
 
             //Si el token es un número, se agrega a la cola de salida
-            result.enqueue(caracter);
+            result.enqueue(tok);
 
             flagExpectingOperator = true;
             flagExpectingFunction = false;
-            flagExpectingNumber = true;
+            flagExpectingNumber = false;
 
-        } else{
-            
-            cout<<"Carácter no reconocido: "<<caracter.getAsString()<<endl;
+        } else { // error imposible, esto ya debería estar validado
+            cerr << "Internal error, token: "
+                 << tok
+                 << "."
+                 << endl;
             exit(1);
-
         }
     }
 
-    //ya se parseó todo el string. Esperamos un operador
+    //ya se parsearon todos los tokens. Esperamos un operador
     //ya que lo ultimo fue un valor
-    if (!flagExpectingOperator){
-        cout<<"Se esperaba un valor"<<endl;
-        exit(1);
-    }
+    if (!flagExpectingOperator)
+        errorHandlerUnexpectedToken(tok);
 
     /*
     Cuando no hay más tokens para leer:
@@ -542,10 +336,9 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
             retire (pop) al operador y póngalo en la cola de salida.
     */
     while (!container.isEmpty()) {
-        if (container.topElement().getAsString() == "("){
-            cout<<"Parentesis desbalanceados"<<endl;
-            exit(1);
-        }
+        if (container.topElement().isOpenParenthesis())
+                errorHandlerMismatchedParentheses();
+
         var = container.topElement();
         result.enqueue(var);
         container.pop();
@@ -554,31 +347,27 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
 
 }
 
-bool isOperator(const string& token) {
-    return token == "+" || token == "-" || token == "*" ||
-           token == "/" || token == "^";
-}
-
-bool isFunction(const string& token) {
-
-    for (size_t i=0; !function_tokens[i].empty(); i++){
-
-        if (function_tokens[i].compare(token) == 0) {
-
-            return true;
-        }
-    }
-
-    return false;
-}
-
 int precedenceOf(const string& token) {
-    
+
     if (token == "+" || token == "-") return 0;
     if (token == "*" || token == "/") return 1;
-    if (isFunction(token)) return 2;
+    if (is_function(token)) return 2;
     if (token == "^") return 3;
     return -1;
+}
+
+void errorHandlerUnexpectedToken(const token &t) {
+    cerr << "Error: invalid syntax in the expression, near token: "
+         << t
+         << "."
+         << endl;
+    exit(1);
+}
+
+void errorHandlerMismatchedParentheses() {
+    cerr << "Error: mismatched parentheses in the expression."
+         << endl;
+    exit(1);
 }
 
 
@@ -596,7 +385,7 @@ complejo calculateRPN(queue<string>* rpn){
     while(!rpn->isEmpty()){
         caux = rpn->dequeue();
 
-        if(isOperator(caux)){ //si es un operador
+        if(is_operator(caux)){ //si es un operador
 
             //TODO: Lo operandos deben ser complejos
             //op1 = atof(container->pop().c_str());
