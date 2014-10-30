@@ -74,6 +74,8 @@ static const string function_tokens[] =
     "im",
     "abs",
     "phase",
+    "sin",
+    "cos"
     "" // No olvidar centinela de cadena vacía
 };
 
