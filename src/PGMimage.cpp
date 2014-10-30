@@ -154,6 +154,7 @@ istream & operator>>(istream &is, PGMimage &c)
     pixel_t d = 0, **auxcnv;
     bool errors = true;
     char mn[MAGIC_NUMBER_LENGTH + 1];
+    double scale = 1;
 
     // Lectura del encabezado
     is.get(mn, MAGIC_NUMBER_LENGTH + 1);
@@ -166,10 +167,21 @@ istream & operator>>(istream &is, PGMimage &c)
         {
             PGMimage::ignore_comments(is);
             // Profundidad de color
-            if (is >> aux)
+            if (is >> aux && aux >= MIN_COLOR_DEPTH)
             {
-                d = aux;
                 errors = false;
+                // Recorte en profundidad, de ser necesario
+                if (aux > MAX_COLOR_DEPTH)
+                {
+                    cerr << "Warning: max color depth is "
+                         << MAX_COLOR_DEPTH
+                         << ", the image will be adapted."
+                         << endl;
+                    // Escala para adaptar la imagen
+                    scale = MAX_COLOR_DEPTH / aux;
+                    d = MAX_COLOR_DEPTH;
+                }
+                else d = aux;
             }
         }
     }
@@ -177,9 +189,6 @@ istream & operator>>(istream &is, PGMimage &c)
     // Lectura de los datos de pixel
     if (!errors)
     {
-        // Limitar profundidad de color
-        PGMimage::validate_color_depth(d);
-
         // Memoria para el lienzo
         auxcnv = PGMimage::new_canvas(w, h);
 
@@ -189,7 +198,7 @@ istream & operator>>(istream &is, PGMimage &c)
             for (j = 0; j < w; j++)
             {
                 PGMimage::ignore_comments(is);
-                if (is >> aux) auxcnv[i][j] = aux;
+                if (is >> aux) auxcnv[i][j] = scale * aux;
                 else { errors = true; break; }
             }
             if (errors) break;
