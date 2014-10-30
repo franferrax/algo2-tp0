@@ -21,6 +21,7 @@ class queue {
         T dequeue();
         bool isEmpty() const;
         T& frontElement();
+        const T& lastAdded() const;
 
     private:
         node<T> *_first, *_last;
@@ -85,6 +86,14 @@ template <class T>
 T& queue<T>::frontElement(){
 
     return _first->_value;
+
+}
+
+
+template <class T>
+const T& queue<T>::lastAdded() const{
+
+    return _last->_value;
 
 }
 
