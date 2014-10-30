@@ -116,7 +116,7 @@ const complejo complejo::operator/(const complejo &c)const {
 }
 
 
-/* /////////////| Miembros estáticos, funciones exp, log y pow |///////////// */
+/*|/////////| Miembros estáticos, funciones exp, log, pow, sin, cos |\\\\\\\\|*/
 
 //exp(z) = exp(x+iy) = exp(x) * exp(iy) = exp(x) * (cos(y) + i sin(y))
 const complejo complejo::Exp(const complejo &z) {
@@ -131,4 +131,14 @@ const complejo complejo::Log(const complejo &z) {
 //w^z = exp(z * log(w))
 const complejo complejo::Pow(const complejo &w, const complejo &z) {
     return complejo::Exp(z * complejo::Log(w));
+}
+
+// sin(z) = sin(x+iy) = sin(x)*cosh(y) + i cos(x)*sinh(y)
+const complejo complejo::Sin(const complejo &z) {
+    return complejo (sin(z.x) * cosh(z.y), cos(z.x) * sinh(z.y));
+}
+
+// cos(z) = cos(x+iy) = cos(x)*cosh(y) - i sin(x)*sinh(y)
+const complejo complejo::Cos(const complejo &z) {
+    return complejo (cos(z.x) * cosh(z.y), - sin(z.x) * sinh(z.y));
 }
