@@ -60,13 +60,7 @@ size_t getRowFromComplex(const complejo &, size_t);
 // 8) Obtener la columna asociada al complejo ( [ ][j] )
 size_t getColFromComplex(const complejo &, size_t);
 
-// 9) Conversión a notación polaca inversa
-void convertToRPN(queue<token> &, queue<token> &);
-int precedenceOf(const string &);
-void errorHandlerUnexpectedToken(const token &);
-void errorHandlerMismatchedParentheses();
-
-// 10) Calculo y resultado de la operación en notación polaca inversa
+// 9) Calculo y resultado de la operación en notación polaca inversa
 complejo calculateRPN(queue<string> *);
 
 #endif    /* UTILS_H */

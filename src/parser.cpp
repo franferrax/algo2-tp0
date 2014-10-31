@@ -46,7 +46,7 @@ string token::getAsString() const
 
     return this->_s;
 }
-// NOTA: si bien es capaz de devolver el valor en una string no utilizar
+// NOTA: si bien es capaz de devolver el valor en una string, no utilizar
 // innecesariamente.
 
 
@@ -116,6 +116,25 @@ bool token::isFunction() const
 
 
 /*|/////////////////////////////////|   5)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*|///////| Precedencia, si es que el token es un operador o función |\\\\\\\|*/
+/*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+int token::precedence() const
+{
+    if (this->isOperator())
+    {
+        if (this->_s == "+" || this->_s == "-") return 0;
+        if (this->_s == "*" || this->_s == "/") return 1;
+        if (this->_s == "^") return 3;
+    }
+
+    if (this->isFunction()) return 2;
+
+    return NOT_FOUND; // Si la precedencia no es aplicable, devuelve NOT_FOUND
+}
+
+
+
+/*|/////////////////////////////////|   6)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|///////////////////| Impresión en flujo/archivo/stdin |\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 ostream & operator<<(ostream &os, const token &t)
@@ -180,14 +199,14 @@ void parse_expression_in_tokens(const string &input, queue<token> &output)
                 exit(1);
             }
 
-            // Si se logra, se agrega a la cola de output
+            // Si se logra, se agrega a la cola de salida
             output.enqueue(token(aux_n));
         }
 
         // Si no, puede tratarse de un operador o un paréntesis
         else if ( is_operator(aux_s) || is_parenthesis(aux_s) )
         {
-            // Caso especial, "-" como operador unario, se agrega un 0
+            // Caso especial, "-" como operador unario, se agrega un 0 antes
             if ( aux_s == "-" &&
                  (output.isEmpty() || output.lastAdded().isOpenParenthesis()) )
                 output.enqueue(token(0));
@@ -201,7 +220,7 @@ void parse_expression_in_tokens(const string &input, queue<token> &output)
         {
             expr.ignore();
 
-            // Se levantan todos los caracteres alfabéticos a la cadena
+            // Se levantan todos los caracteres alfabéticos a la cadena auxiliar
             while ( isalpha(expr.peek()) )
                 aux_s += expr.get();
 
@@ -222,4 +241,169 @@ void parse_expression_in_tokens(const string &input, queue<token> &output)
             }
         }
     }
+}
+
+
+
+/*|/////////////////////////////////|   3)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*|/////////////////| Conversión a notación polaca inversa |\\\\\\\\\\\\\\\\\|*/
+/*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+void convertToRPN(queue<token> &result, queue<token> &tokens){
+
+    token tok;
+    stack<token> aux; // Pila auxiliar para la conversión
+
+    bool flagExpectingOperator = false;
+    bool flagExpectingNumber = false;
+    bool flagExpectingFunction = true;
+
+    while (!tokens.isEmpty()) {
+
+        tok = tokens.dequeue();
+
+        //Si el token es un operador, o1, entonces:
+        if (tok.isOperator()){
+
+            if (!flagExpectingOperator)
+                errorHandlerUnexpectedToken(tok);
+
+            /*
+            mientras que haya un operador, o2, en el tope de la pila (esto
+            excluye el paréntesis abierto), y
+                * o1 es asociativo izquierdo y su precedencia es menor que (una
+                precedencia más baja) o igual a la de o2, ó
+                * o1 es asociativo derecho y su precedencia es menor que (una
+                precedencia más baja) que la de o2,
+            retire (pop) de la pila el o2, y póngalo en la cola de salida.
+            */
+            while ( !aux.isEmpty() &&
+                    (  aux.topElement().isOperator() ||
+                       aux.topElement().isFunction()  )   &&
+                     aux.topElement().precedence() >= tok.precedence() ) {
+
+                result.enqueue(aux.topElement());
+                aux.pop();
+            }
+
+            //ponga (push) o1 en el tope de la pila.
+            aux.push(tok);
+
+            flagExpectingOperator = false;
+            flagExpectingFunction = true;
+            flagExpectingNumber = true;
+
+        } else if (tok.isFunction()){
+
+            if (!flagExpectingFunction)
+                errorHandlerUnexpectedToken(tok);
+
+            while ( !aux.isEmpty() && aux.topElement().isOperator() &&
+                    aux.topElement().precedence() >= tok.precedence() ) {
+
+                result.enqueue(aux.topElement());
+                aux.pop();
+            }
+
+            //ponga (push) o1 en el tope de la pila.
+            aux.push(tok);
+
+            flagExpectingOperator = false;
+            flagExpectingFunction = false;
+            flagExpectingNumber = false;
+
+        //Si el token es un paréntesis abierto, entonces póngalo en la pila.
+        } else if (tok.isOpenParenthesis()) {
+
+            //si esperaba un operador
+            if (flagExpectingOperator)
+                errorHandlerUnexpectedToken(tok);
+
+            aux.push(tok);
+
+            flagExpectingNumber = false;
+
+        //Si el token es un paréntesis derecho
+        } else if (tok.isClosedParenthesis()) {
+
+            //esto debe aparecer después de un numero/función, no de un operador
+            if (!flagExpectingOperator)
+                errorHandlerUnexpectedToken(tok);
+
+            /*Hasta que el token en el tope de la pila sea un paréntesis
+            abierto, retire (pop) a los operadores de la pila y colóquelos
+            en la cola de salida.*/
+            while ( !aux.isEmpty() &&
+                    !aux.topElement().isOpenParenthesis() ) {
+
+                result.enqueue(aux.topElement());
+                aux.pop();
+            }
+
+            //Si la pila se termina sin encontrar un paréntesis abierto,
+            //entonces hay paréntesis sin pareja.
+            if (aux.isEmpty())
+                errorHandlerMismatchedParentheses();
+
+            //Retire (pop) el paréntesis abierto de la pila,
+            //pero no lo ponga en la cola de salida.
+            aux.pop();
+
+            /* Ahora esperamos un operador */
+            flagExpectingOperator = true;
+            flagExpectingFunction = true;
+            flagExpectingNumber = false;
+
+        //encuentre un numero
+        } else if (tok.isValue() || tok.isSpecial()) {
+
+            /* If we're expecting an operator, we're very disappointed. */
+            if (flagExpectingOperator && !flagExpectingNumber)
+                errorHandlerUnexpectedToken(tok);
+
+            //Si el token es un número, se agrega a la cola de salida
+            result.enqueue(tok);
+
+            flagExpectingOperator = true;
+            flagExpectingFunction = false;
+            flagExpectingNumber = false;
+
+        }
+    }
+
+    //ya se parsearon todos los tokens. Esperamos un operador
+    //ya que lo ultimo fue un valor
+    if (!flagExpectingOperator)
+        errorHandlerUnexpectedToken(tok);
+
+    /*
+    Cuando no hay más tokens para leer:
+        Mientras todavía haya tokens de operadores en la pila:
+            Si el token del operador en el tope de la pila es un paréntesis,
+            entonces hay paréntesis sin la pareja correspondiente.
+            retire (pop) al operador y póngalo en la cola de salida.
+    */
+    while (!aux.isEmpty()) {
+        if (aux.topElement().isOpenParenthesis())
+                errorHandlerMismatchedParentheses();
+
+        result.enqueue(aux.topElement());
+        aux.pop();
+    }
+
+}
+
+// Extra: manejador de error en caso de token inesperado
+void errorHandlerUnexpectedToken(const token &t) {
+    cerr << "Error: invalid syntax in the expression, near token: "
+         << t
+         << "."
+         << endl;
+    exit(1);
+}
+
+// Extra: manejador de error en caso de paréntesis desbalanceado
+void errorHandlerMismatchedParentheses() {
+    cerr << "Error: mismatched parentheses in the expression."
+         << endl;
+    exit(1);
 }

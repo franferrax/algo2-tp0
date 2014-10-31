@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <limits>
 #include "queue.h"
+#include "stack.h"
 
 using namespace std;
 
@@ -46,7 +47,10 @@ public:
     bool isSpecial() const;           // ¿Es especial?
     bool isFunction() const;          // ¿Es una función?
 
-    // 5) Impresión en flujo/archivo/stdin
+    // 5) Precedencia, si es que el token es un operador o función
+    int precedence() const;
+
+    // 6) Impresión en flujo/archivo/stdin
     friend ostream & operator<<(ostream &, const token &);
 };
 
@@ -111,5 +115,11 @@ int find_in_list(const string [], const string &);
 
 // 2) Función para parsear la expresión de entrada partiéndola en tokens
 void parse_expression_in_tokens(const string &, queue<token> &);
+
+// 3) Conversión a notación polaca inversa
+void convertToRPN(queue<token> &, queue<token> &);
+void errorHandlerUnexpectedToken(const token &);
+void errorHandlerMismatchedParentheses();
+
 
 #endif /* PARSER_H */
