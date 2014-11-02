@@ -2,7 +2,7 @@
 #include <fstream>
 #include "cmdline.h"
 #include "PGMimage.h"
-#include "complejo.h"
+#include "complex.h"
 #include "utils.h"
 #include "stack.h"
 #include <string>
@@ -26,7 +26,7 @@ fstream ofs_;                   // Archivo de salida
 char *prog_name_;               // Nombre del programa
 double map_w_;                  // Ancho de la región de mapeo
 double map_h_;                  // Alto de la región de mapeo
-complejo map_c_;                // Centro de la región de mapeo
+complex map_c_;                 // Centro de la región de mapeo
 stack<token> rpn_expr_;         // Expresión convertida a RPN
 
 
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
     PGMimage out_image(w, h, in_image.getColorDepth());
 
     // Recorrido de la imagen y transformación
-    complejo in_plane, out_plane;
+    complex in_plane, out_plane;
     size_t i, j, row, col;
 
     for (i = 0; i < h; i++)

@@ -158,7 +158,7 @@ void opt_help(const string &arg)
 /*|/////////////////////////////////|   6)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|///////////////| Obtener complejo asociado a los índices |\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-void get_complex_from_index(complejo &z, size_t i, size_t j,
+void get_complex_from_index(complex &z, size_t i, size_t j,
                          size_t h, size_t w)
 {
     if ( h && w && i < h && j < w)
@@ -174,7 +174,7 @@ void get_complex_from_index(complejo &z, size_t i, size_t j,
 /*|/////////////////////////////////|   7)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|///////////| Obtener la fila asociada al complejo ( [i][ ] ) |\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-size_t get_row_from_complex(const complejo &z, size_t h)
+size_t get_row_from_complex(const complex &z, size_t h)
 {
     return h * ( 0.5 - (z.getImag()-map_c_.getImag()) / map_h_ );
 }
@@ -184,7 +184,7 @@ size_t get_row_from_complex(const complejo &z, size_t h)
 /*|/////////////////////////////////|   8)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|//////////| Obtener la columna asociada al complejo ( [ ][j] ) \\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-size_t get_col_from_complex(const complejo &z, size_t w)
+size_t get_col_from_complex(const complex &z, size_t w)
 {
     return w * ( 0.5 + (z.getReal()-map_c_.getReal()) / map_w_ );
 }

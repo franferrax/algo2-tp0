@@ -25,12 +25,12 @@ INSTALL_DIR = /usr/bin
 
     # -------------------------- Códigos objeto -------------------------- #
 OBJECTS = $(addprefix $(BIN_DIR)/, \
-    PGMimage.o   \
-    complejo.o   \
-    utils.o      \
-    cmdline.o    \
-    parser.o     \
-    main.o       \
+    PGMimage.o     \
+    complex.o      \
+    utils.o        \
+    cmdline.o      \
+    parser.o       \
+    main.o         \
 )
 FULL_OUT = $(BIN_DIR)/$(OUT)
 
@@ -46,40 +46,40 @@ $(BIN_DIR):
 
     # -------------------------- Dependencias ---------------------------- #
 $(BIN_DIR)/PGMimage.o: $(addprefix $(SRC_DIR)/, \
-    PGMimage.cpp \
-    PGMimage.h   \
+    PGMimage.cpp   \
+    PGMimage.h     \
 ) | $(BIN_DIR)
 
-$(BIN_DIR)/complejo.o: $(addprefix $(SRC_DIR)/, \
-    complejo.cpp \
-    complejo.h   \
+$(BIN_DIR)/complex.o: $(addprefix $(SRC_DIR)/, \
+    complex.cpp    \
+    complex.h      \
 ) | $(BIN_DIR)
 
 $(BIN_DIR)/utils.o: $(addprefix $(SRC_DIR)/, \
-    utils.cpp    \
-    utils.h      \
+    utils.cpp      \
+    utils.h        \
 ) | $(BIN_DIR)
 
 $(BIN_DIR)/cmdline.o: $(addprefix $(SRC_DIR)/, \
-    cmdline.cpp  \
-    cmdline.h    \
+    cmdline.cpp    \
+    cmdline.h      \
 ) | $(BIN_DIR)
 
 $(BIN_DIR)/parser.o: $(addprefix $(SRC_DIR)/, \
-    parser.cpp  \
-    parser.h    \
+    parser.cpp     \
+    parser.h       \
 ) | $(BIN_DIR)
 
 $(BIN_DIR)/main.o: $(addprefix $(SRC_DIR)/, \
-    main.cpp     \
-    PGMimage.h   \
-    complejo.h   \
-    utils.h      \
-    cmdline.h    \
-    node.h       \
-    queue.h      \
-    stack.h      \
-    parser.h     \
+    main.cpp       \
+    PGMimage.h     \
+    complex.h      \
+    utils.h        \
+    cmdline.h      \
+    node.h         \
+    queue.h        \
+    stack.h        \
+    parser.h       \
 ) | $(BIN_DIR)
 
 
