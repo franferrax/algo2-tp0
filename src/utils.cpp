@@ -20,16 +20,16 @@ void opt_input(const string &arg)
     // Por defecto stdin, o bien archivo
     if (arg == "-")
     {
-        iss = &cin;
+        iss_ = &cin;
     }
     else
     {
-        ifs.open(arg.c_str(), ios::in);
-        iss = &ifs;
+        ifs_.open(arg.c_str(), ios::in);
+        iss_ = &ifs_;
     }
 
     // Comprobación de errores
-    if ( !iss->good() )
+    if ( !iss_->good() )
     {
         cerr << "Cannot open "
              << arg
@@ -49,16 +49,16 @@ void opt_output(const string &arg)
     // Por defecto stdout, o bien archivo
     if (arg == "-")
     {
-        oss = &cout;
+        oss_ = &cout;
     }
     else
     {
-        ofs.open(arg.c_str(), ios::out);
-        oss = &ofs;
+        ofs_.open(arg.c_str(), ios::out);
+        oss_ = &ofs_;
     }
 
     // Comprobación de errores
-    if ( !oss->good() )
+    if ( !oss_->good() )
     {
         cerr << "Cannot open "
              << arg
@@ -78,7 +78,7 @@ void opt_function(const string &arg)
     queue<token> tokenized_expr;
 
     parse_expression_in_tokens(arg, tokenized_expr);
-    convertToRPN(rpn_expr, tokenized_expr);
+    convert_to_RPN(rpn_expr_, tokenized_expr);
 }
 
 
@@ -93,22 +93,22 @@ void opt_region(const string &arg)
     bool errors = true;
 
     // Lectura de los parámetros, ignorando el separador (',' o cualquier char)
-    if (arg_stream >> map_w)
+    if (arg_stream >> map_w_)
     {
         arg_stream.ignore();
 
-        if (arg_stream >> map_h)
+        if (arg_stream >> map_h_)
         {
             arg_stream.ignore();
 
             if (arg_stream >> aux)
             {
-                map_c.SetReal(aux);
+                map_c_.setReal(aux);
                 arg_stream.ignore();
 
                 if (arg_stream >> aux)
                 {
-                    map_c.SetImag(aux);
+                    map_c_.setImag(aux);
 
                     // Si se llegó hasta aquí, se pudieron leer los
                     // 4 parámetros, si hay algo más se ignora
@@ -129,9 +129,9 @@ void opt_region(const string &arg)
     }
 
     // Error por ancho o alto no "positivos distintos de cero"
-    if (map_w <= 0 || map_h <=0)
+    if (map_w_ <= 0 || map_h_ <=0)
     {
-        cerr << map_w << "," << map_h
+        cerr << map_w_ << "," << map_h_
              << ": must be positive nonzero numbers."
              << endl;
         exit(1);
@@ -147,7 +147,7 @@ void opt_region(const string &arg)
 void opt_help(const string &arg)
 {
     cout << "Usage: "
-         << prog_name
+         << prog_name_
          << " [-i file] [-o file] [-r w,h,x0,y0] [-f expression(z)]"
          << endl;
     exit(0);
@@ -158,14 +158,14 @@ void opt_help(const string &arg)
 /*|/////////////////////////////////|   6)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|///////////////| Obtener complejo asociado a los índices |\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-void getComplexFromIndex(complejo &z, size_t i, size_t j,
+void get_complex_from_index(complejo &z, size_t i, size_t j,
                          size_t h, size_t w)
 {
     if ( h && w && i < h && j < w)
     {
-        z.SetReal( map_w * ( ((double)j + 0.5) / (double)w  -  0.5 ) );
-        z.SetImag( map_h * ( 0.5  -  ((double)i + 0.5) / (double)h ) );
-        z += map_c;
+        z.setReal( map_w_ * ( ((double)j + 0.5) / (double)w  -  0.5 ) );
+        z.setImag( map_h_ * ( 0.5  -  ((double)i + 0.5) / (double)h ) );
+        z += map_c_;
     }
 }
 
@@ -174,9 +174,9 @@ void getComplexFromIndex(complejo &z, size_t i, size_t j,
 /*|/////////////////////////////////|   7)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|///////////| Obtener la fila asociada al complejo ( [i][ ] ) |\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-size_t getRowFromComplex(const complejo &z, size_t h)
+size_t get_row_from_complex(const complejo &z, size_t h)
 {
-    return h * ( 0.5 - (z.GetImag()-map_c.GetImag()) / map_h );
+    return h * ( 0.5 - (z.getImag()-map_c_.getImag()) / map_h_ );
 }
 
 
@@ -184,47 +184,7 @@ size_t getRowFromComplex(const complejo &z, size_t h)
 /*|/////////////////////////////////|   8)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|//////////| Obtener la columna asociada al complejo ( [ ][j] ) \\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-size_t getColFromComplex(const complejo &z, size_t w)
+size_t get_col_from_complex(const complejo &z, size_t w)
 {
-    return w * ( 0.5 + (z.GetReal()-map_c.GetReal()) / map_w );
-}
-
-
-
-/*|/////////////////////////////////|   9)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-/*|////| Cálculo y resultado de la operación en notación polaca inversa |\\\\|*/
-/*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-complejo calculateRPN(queue<string>* rpn){
-
-    stack<string> *container = new stack<string>();
-    string caux;
-    double op1, op2, result=0;
-    complejo c;
-
-    while(!rpn->isEmpty()){
-        caux = rpn->dequeue();
-
-        if(is_operator(caux)){ //si es un operador
-
-            //TODO: Lo operandos deben ser complejos
-            //op1 = atof(container->pop().c_str());
-            //op2 = atof(container->pop().c_str());
-            stringstream arg_stream_op1(container->pop());
-            stringstream arg_stream_op2(container->pop());
-
-            if(arg_stream_op1 >> op1 && arg_stream_op2 >> op2){
-                //TODO: aplicar la funcion caux a op1 y op2
-            }else{
-                cout<<"Se esperaban operandos en la pila"<<endl;
-                exit(1);
-            }
-
-        } else{ //sino es un numero
-            container->push(caux);
-        }
-    }
-
-    c.SetReal(result);
-    return c;
-
+    return w * ( 0.5 + (z.getReal()-map_c_.getReal()) / map_w_ );
 }

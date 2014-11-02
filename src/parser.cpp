@@ -206,23 +206,26 @@ void parse_expression_in_tokens(const string &input, queue<token> &output)
         // Si no, puede tratarse de un operador o un paréntesis
         else if ( is_operator(aux_s) || is_parenthesis(aux_s) )
         {
+            // Ya es algo válido, se elimina del stream
+            expr.ignore();
+
             // Caso especial, "-" como operador unario, se agrega un 0 antes
-            if ( aux_s == "-" &&
-                 (output.isEmpty() || output.lastAdded().isOpenParenthesis()) )
+            if ( aux_s == "-" && check_for_unary_op(output) )
                 output.enqueue(token(0));
 
-            expr.ignore();
+            // Caso especial, "+" como operador unario, se ignora
+            if ( aux_s == "+" && check_for_unary_op(output) )
+                continue;
+
             output.enqueue(token(aux_s));
         }
 
         // O si no, queda el grupo alfabético de output: funciones o especiales
         else
         {
-            expr.ignore();
-
             // Se levantan todos los caracteres alfabéticos a la cadena auxiliar
-            while ( isalpha(expr.peek()) )
-                aux_s += expr.get();
+            expr.ignore(); // El primero ya está en la cadena, se ignora
+            while ( isalpha(expr.peek()) ) aux_s += expr.get();
 
             // Si coincide con alguno de estos, se encola
             if ( is_function(aux_s) || is_special(aux_s) )
@@ -248,7 +251,7 @@ void parse_expression_in_tokens(const string &input, queue<token> &output)
 /*|/////////////////////////////////|   3)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////| Conversión a notación polaca inversa |\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-void convertToRPN(queue<token> &result, queue<token> &tokens){
+void convert_to_RPN(stack<token> &result, queue<token> &tokens){
 
     token tok;
     stack<token> aux; // Pila auxiliar para la conversión
@@ -265,7 +268,7 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
         if (tok.isOperator()){
 
             if (!flagExpectingOperator)
-                errorHandlerUnexpectedToken(tok);
+                error_handler_unexpected_token(tok);
 
             /*
             mientras que haya un operador, o2, en el tope de la pila (esto
@@ -281,7 +284,7 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
                        aux.topElement().isFunction()  )   &&
                      aux.topElement().precedence() >= tok.precedence() ) {
 
-                result.enqueue(aux.topElement());
+                result.push(aux.topElement());
                 aux.pop();
             }
 
@@ -295,12 +298,12 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
         } else if (tok.isFunction()){
 
             if (!flagExpectingFunction)
-                errorHandlerUnexpectedToken(tok);
+                error_handler_unexpected_token(tok);
 
             while ( !aux.isEmpty() && aux.topElement().isOperator() &&
                     aux.topElement().precedence() >= tok.precedence() ) {
 
-                result.enqueue(aux.topElement());
+                result.push(aux.topElement());
                 aux.pop();
             }
 
@@ -316,7 +319,7 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
 
             //si esperaba un operador
             if (flagExpectingOperator)
-                errorHandlerUnexpectedToken(tok);
+                error_handler_unexpected_token(tok);
 
             aux.push(tok);
 
@@ -327,7 +330,7 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
 
             //esto debe aparecer después de un numero/función, no de un operador
             if (!flagExpectingOperator)
-                errorHandlerUnexpectedToken(tok);
+                error_handler_unexpected_token(tok);
 
             /*Hasta que el token en el tope de la pila sea un paréntesis
             abierto, retire (pop) a los operadores de la pila y colóquelos
@@ -335,14 +338,14 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
             while ( !aux.isEmpty() &&
                     !aux.topElement().isOpenParenthesis() ) {
 
-                result.enqueue(aux.topElement());
+                result.push(aux.topElement());
                 aux.pop();
             }
 
             //Si la pila se termina sin encontrar un paréntesis abierto,
             //entonces hay paréntesis sin pareja.
             if (aux.isEmpty())
-                errorHandlerMismatchedParentheses();
+                error_handler_mismatched_parentheses();
 
             //Retire (pop) el paréntesis abierto de la pila,
             //pero no lo ponga en la cola de salida.
@@ -358,10 +361,10 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
 
             /* If we're expecting an operator, we're very disappointed. */
             if (flagExpectingOperator && !flagExpectingNumber)
-                errorHandlerUnexpectedToken(tok);
+                error_handler_unexpected_token(tok);
 
             //Si el token es un número, se agrega a la cola de salida
-            result.enqueue(tok);
+            result.push(tok);
 
             flagExpectingOperator = true;
             flagExpectingFunction = false;
@@ -373,7 +376,7 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
     //ya se parsearon todos los tokens. Esperamos un operador
     //ya que lo ultimo fue un valor
     if (!flagExpectingOperator)
-        errorHandlerUnexpectedToken(tok);
+        error_handler_unexpected_token(tok);
 
     /*
     Cuando no hay más tokens para leer:
@@ -384,16 +387,16 @@ void convertToRPN(queue<token> &result, queue<token> &tokens){
     */
     while (!aux.isEmpty()) {
         if (aux.topElement().isOpenParenthesis())
-                errorHandlerMismatchedParentheses();
+            error_handler_mismatched_parentheses();
 
-        result.enqueue(aux.topElement());
+        result.push(aux.topElement());
         aux.pop();
     }
 
 }
 
 // Extra: manejador de error en caso de token inesperado
-void errorHandlerUnexpectedToken(const token &t) {
+void error_handler_unexpected_token(const token &t) {
     cerr << "Error: invalid syntax in the expression, near token: "
          << t
          << "."
@@ -402,7 +405,7 @@ void errorHandlerUnexpectedToken(const token &t) {
 }
 
 // Extra: manejador de error en caso de paréntesis desbalanceado
-void errorHandlerMismatchedParentheses() {
+void error_handler_mismatched_parentheses() {
     cerr << "Error: mismatched parentheses in the expression."
          << endl;
     exit(1);

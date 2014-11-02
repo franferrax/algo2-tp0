@@ -9,7 +9,7 @@ class complejo
 {
 private:
 
-    double x, y;
+    double _x, _y;
 
 public:
 
@@ -19,14 +19,14 @@ public:
 
     ~complejo();
 
-    double GetReal()const;
-    double GetImag()const;
+    double getReal()const;
+    double getImag()const;
 
-    void SetReal(double xx);
-    void SetImag(double yy);
+    void setReal(double xx);
+    void setImag(double yy);
 
-    double GetArg()const;
-    double GetPha()const;
+    double getArg()const;
+    double getPha()const;
 
     friend ostream& operator<<(ostream&, const complejo &);
     friend istream& operator>>(istream&, complejo &);
@@ -40,11 +40,11 @@ public:
     const complejo operator*(const complejo &)const;
     const complejo operator/(const complejo &)const;
 
-    static const complejo Exp(const complejo &);
-    static const complejo Log(const complejo &);
-    static const complejo Pow(const complejo &, const complejo &);
-    static const complejo Sin(const complejo &);
-    static const complejo Cos(const complejo &);
+    static const complejo exp(const complejo &);
+    static const complejo log(const complejo &);
+    static const complejo pow(const complejo &, const complejo &);
+    static const complejo sin(const complejo &);
+    static const complejo cos(const complejo &);
 };
 
 #endif

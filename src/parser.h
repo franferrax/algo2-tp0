@@ -6,7 +6,7 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
-#include <limits>
+#include <cmath>
 #include "queue.h"
 #include "stack.h"
 
@@ -17,7 +17,6 @@ using namespace std;
 /*||||||||||||||||||||||||||||||||||| Token ||||||||||||||||||||||||||||||||||*/
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
 
-#define NAN            (numeric_limits<double>::quiet_NaN())
 #define TOKEN_IS_VALUE "0v0"
 
 class token
@@ -69,6 +68,10 @@ public:
 #define is_special(s)      ( find_in_list(special_tokens,  s) != NOT_FOUND )
 #define is_function(s)     ( find_in_list(function_tokens, s) != NOT_FOUND )
 
+// Chequeo de +/- como operador unario: si es el primero o viene luego de '('
+#define check_for_unary_op(q) ((q).isEmpty() || \
+                               (q).lastAdded().isOpenParenthesis())
+
 
 // Funciones a interpretar
 static const string function_tokens[] =
@@ -117,9 +120,9 @@ int find_in_list(const string [], const string &);
 void parse_expression_in_tokens(const string &, queue<token> &);
 
 // 3) Conversión a notación polaca inversa
-void convertToRPN(queue<token> &, queue<token> &);
-void errorHandlerUnexpectedToken(const token &);
-void errorHandlerMismatchedParentheses();
+void convert_to_RPN(stack<token> &, queue<token> &);
+void error_handler_unexpected_token(const token &);
+void error_handler_mismatched_parentheses();
 
 
 #endif /* PARSER_H */

@@ -17,26 +17,26 @@ typedef unsigned char pixel_t;
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
 class PGMimage
 {
-    static const string MagicNumber; // Número mágico PGM
-    size_t              Width;       // Ancho del lienzo (imagen)
-    size_t              Height;      // Alto del lienzo (imagen)
-    pixel_t             ColorDepth;  // Profundidad del color (niveles)
-    pixel_t             **canvas;    // Lienzo, matriz de imagen
+    static const string _magic_number; // Número mágico PGM
+    size_t              _width;        // Ancho del lienzo (imagen)
+    size_t              _height;       // Alto del lienzo (imagen)
+    pixel_t             _color_depth;  // Profundidad del color (niveles)
+    pixel_t             **_canvas;     // Lienzo, matriz de imagen
 
 
     ///////////////////////// Utilidades internas //////////////////////////
 
     // Ignorar comentarios estilo PGM en un stream
-    static void ignore_comments(istream &);
+    static void _ignore_comments(istream &);
 
     // Pedir memoria para un lienzo de w x h
-    static pixel_t** new_canvas(size_t, size_t);
+    static pixel_t** _new_canvas(size_t, size_t);
 
     // Limitar profundidad de color
-    static void validate_color_depth(pixel_t &);
+    static void _validate_color_depth(pixel_t &);
 
     // Destruir el lienzo sobre el objeto actual
-    void canvasDestroy();
+    static void _canvas_destroy(size_t, pixel_t **);
 
 
 public:
@@ -47,7 +47,7 @@ public:
     PGMimage(const PGMimage &);
 
     // 3) Destructor
-    ~ PGMimage() { canvasDestroy(); };
+    ~ PGMimage() { _canvas_destroy(this->_height, this->_canvas); };
 
     // 4) Indexación del lienzo (l-value y r-value: c[y][x])
     pixel_t* operator[](size_t) const;
