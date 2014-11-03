@@ -1,9 +1,3 @@
-/*
- * File:   utils.h
- * Author: juanzaragoza
- *
- * Created on 13 de septiembre de 2014, 14:54
- */
 #ifndef UTILS_H
 #define UTILS_H
 
@@ -11,23 +5,25 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
-#include "complex.h"
+#include <string>
 #include "cmdline.h"
+#include "stack.h"
 #include "queue.h"
+#include "complex.h"
 #include "parser.h"
 
 using namespace std;
 
 //////////////////////// Variables globales de main.cpp ////////////////////////
-extern option_t options_[];            // Opciones CLA
-extern istream *iss_;                  // Puntero a stream de entrada
-extern ostream *oss_;                  // Puntero a stream de salida
-extern fstream ifs_;                   // Archivo de entrada
-extern fstream ofs_;                   // Archivo de salida
-extern char *prog_name_;               // Nombre del programa
-extern double map_w_;                  // Ancho de la región de mapeo
-extern double map_h_;                  // Alto de la región de mapeo
-extern complex map_c_;                 // Centro de la región de mapeo
+extern option_t     options_[];        // Opciones CLA
+extern istream      *iss_;             // Puntero a stream de entrada
+extern ostream      *oss_;             // Puntero a stream de salida
+extern fstream      ifs_;              // Archivo de entrada
+extern fstream      ofs_;              // Archivo de salida
+extern char         *prog_name_;       // Nombre del programa
+extern double       map_w_;            // Ancho de la región de mapeo
+extern double       map_h_;            // Alto de la región de mapeo
+extern complex      map_c_;            // Centro de la región de mapeo
 extern stack<token> rpn_expr_;         // Expresión convertida a RPN
 
 

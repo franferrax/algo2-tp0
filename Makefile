@@ -30,6 +30,7 @@ OBJECTS = $(addprefix $(BIN_DIR)/, \
     utils.o        \
     cmdline.o      \
     parser.o       \
+    optree.o       \
     main.o         \
 )
 FULL_OUT = $(BIN_DIR)/$(OUT)
@@ -58,6 +59,12 @@ $(BIN_DIR)/complex.o: $(addprefix $(SRC_DIR)/, \
 $(BIN_DIR)/utils.o: $(addprefix $(SRC_DIR)/, \
     utils.cpp      \
     utils.h        \
+    complex.h      \
+    cmdline.h      \
+    node.h         \
+    stack.h        \
+    queue.h        \
+    parser.h       \
 ) | $(BIN_DIR)
 
 $(BIN_DIR)/cmdline.o: $(addprefix $(SRC_DIR)/, \
@@ -67,6 +74,19 @@ $(BIN_DIR)/cmdline.o: $(addprefix $(SRC_DIR)/, \
 
 $(BIN_DIR)/parser.o: $(addprefix $(SRC_DIR)/, \
     parser.cpp     \
+    parser.h       \
+    node.h         \
+    queue.h        \
+    stack.h        \
+    complex.h      \
+) | $(BIN_DIR)
+
+$(BIN_DIR)/optree.o: $(addprefix $(SRC_DIR)/, \
+    optree.cpp     \
+    optree.h       \
+    complex.h      \
+    node.h         \
+    stack.h        \
     parser.h       \
 ) | $(BIN_DIR)
 
@@ -80,6 +100,7 @@ $(BIN_DIR)/main.o: $(addprefix $(SRC_DIR)/, \
     queue.h        \
     stack.h        \
     parser.h       \
+    optree.h       \
 ) | $(BIN_DIR)
 
 

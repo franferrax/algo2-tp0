@@ -1,10 +1,3 @@
-/*
- * File:   Stack.h
- * Author: juanzaragoza
- *
- * Created on 17 de octubre de 2014, 0:25
- */
-
 #ifndef STACK_H
 #define	STACK_H
 

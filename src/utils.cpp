@@ -1,15 +1,4 @@
-/*
- * File:   utils.cpp
- * Author: juanzaragoza
- *
- * Created on 13 de septiembre de 2014, 14:54
- */
 #include "utils.h"
-#include "stack.h"
-#include "queue.h"
-#include "parser.h"
-#include <string>
-
 
 
 /*|/////////////////////////////////|   1)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/

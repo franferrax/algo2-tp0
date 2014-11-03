@@ -1,11 +1,15 @@
 #include <iostream>
 #include <fstream>
-#include "cmdline.h"
+#include <string>
 #include "PGMimage.h"
 #include "complex.h"
 #include "utils.h"
+#include "cmdline.h"
+#include "node.h"
+#include "queue.h"
 #include "stack.h"
-#include <string>
+#include "parser.h"
+#include "optree.h"
 
 using namespace std;
 
@@ -19,14 +23,14 @@ option_t options_[] =           // Opciones CLA
     {false, "h", "help",     NULL,      opt_help,     OPT_DEFAULT},
     {0, },
 };
-istream *iss_ = NULL;           // Puntero a stream de entrada
-ostream *oss_ = NULL;           // Puntero a stream de salida
-fstream ifs_;                   // Archivo de entrada
-fstream ofs_;                   // Archivo de salida
-char *prog_name_;               // Nombre del programa
-double map_w_;                  // Ancho de la región de mapeo
-double map_h_;                  // Alto de la región de mapeo
-complex map_c_;                 // Centro de la región de mapeo
+istream      *iss_ = NULL;      // Puntero a stream de entrada
+ostream      *oss_ = NULL;      // Puntero a stream de salida
+fstream      ifs_;              // Archivo de entrada
+fstream      ofs_;              // Archivo de salida
+char         *prog_name_;       // Nombre del programa
+double       map_w_;            // Ancho de la región de mapeo
+double       map_h_;            // Alto de la región de mapeo
+complex      map_c_;            // Centro de la región de mapeo
 stack<token> rpn_expr_;         // Expresión convertida a RPN
 
 
@@ -42,17 +46,24 @@ int main(int argc, char** argv)
     cmdline cmdl(options_);
     cmdl.parse(argc, argv);
 
-    /******************* PRUEBA CONVERT RPN **********************/
-    // Prueba del parseo y limpieza de entrada
-    #ifdef DEBUG
-    while(!rpn_expr_.isEmpty())
-    {
-        cout << rpn_expr_.pop() << " ";
-    }
-    cout << endl;
+#ifdef DEBUG
+    // Prueba del árbol de operaciones
+    complex my_z(5, 5);
+
+    optree *arbolito;
+    arbolito = optree::load_from_stack_RPN(rpn_expr_);
+    arbolito-> asociated_pixel = &my_z;
+
+    cout << "expression" << my_z << " = " << arbolito->operate() << endl;
+
+    my_z.setReal(0);
+    cout << "expression" << my_z << " = " << arbolito->operate() << endl;
+
+    //delete arbolito;
+
     exit(1);
-    #endif
-    /******************* PRUEBA CONVERT RPN **********************/
+#endif
+
 
     // Lectura del archivo de entrada
     PGMimage in_image;
@@ -70,10 +81,20 @@ int main(int argc, char** argv)
 
     PGMimage out_image(w, h, in_image.getColorDepth());
 
-    // Recorrido de la imagen y transformación
+    // Variables para recorrer la imagen
     complex in_plane, out_plane;
     size_t i, j, row, col;
 
+    // Árbol de la operación
+    optree *operation;
+
+    // Cargado del árbol
+    operation = optree::load_from_stack_RPN(rpn_expr_);
+
+    // Fijado del puntero al complejo que recorre los pixels
+    operation->asociated_pixel = &out_plane;
+
+    // Recorrido de la imagen y transformación
     for (i = 0; i < h; i++)
     {
         for (j = 0; j < w; j++)
@@ -81,8 +102,8 @@ int main(int argc, char** argv)
             // Pixel en la imagen de salida <-> Punto en el plano de salida
             get_complex_from_index(out_plane, i, j, h, w);
 
-            // Aplicación de la función
-            in_plane = out_plane; // TODO: evaluación de RPN
+            // Aplicación de la operación
+            in_plane = operation->operate();
 
             // Punto en el plano de entrada <-> Pixel en la imagen de entrada
             row = get_row_from_complex(in_plane, h);
@@ -95,6 +116,9 @@ int main(int argc, char** argv)
             }
         }
     }
+
+    // Destrucción del árbol de operaciones
+    delete operation;
 
     // Volcado en el archivo de salida
     *oss_ << out_image;

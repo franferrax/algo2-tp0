@@ -1,5 +1,7 @@
 #include "PGMimage.h"
-const string PGMimage::_magic_number = "P2";
+
+// Definición del número mágico
+const string PGMimage::_magic_number("P2");
 #define MAGIC_NUMBER_LENGTH 2
 
 

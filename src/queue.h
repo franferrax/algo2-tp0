@@ -1,10 +1,3 @@
-/*
- * File:   queue.h
- * Author: juanzaragoza
- *
- * Created on 17 de octubre de 2014, 1:14
- */
-
 #ifndef QUEUE_H
 #define	QUEUE_H
 

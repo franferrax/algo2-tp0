@@ -1,5 +1,6 @@
 #include "parser.h"
 
+
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
 /*||||||||||||||||||||||||||||||||||| Token ||||||||||||||||||||||||||||||||||*/
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
@@ -147,8 +148,9 @@ ostream & operator<<(ostream &os, const token &t)
 
 
 
+
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
-/*||||||||||||||||||||||||||||||||||| Otros ||||||||||||||||||||||||||||||||||*/
+/*|||||||||||||||||||||||||||||||| Utilidades ||||||||||||||||||||||||||||||||*/
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
 
 
@@ -256,9 +258,9 @@ void convert_to_RPN(stack<token> &result, queue<token> &tokens){
     token tok;
     stack<token> aux; // Pila auxiliar para la conversión
 
-    bool flagExpectingOperator = false;
-    bool flagExpectingNumber = false;
-    bool flagExpectingFunction = true;
+    bool expect_operator_flag = false;
+    bool expect_number_flag = false;
+    bool expect_function_flag = true;
 
     while (!tokens.isEmpty()) {
 
@@ -267,7 +269,7 @@ void convert_to_RPN(stack<token> &result, queue<token> &tokens){
         //Si el token es un operador, o1, entonces:
         if (tok.isOperator()){
 
-            if (!flagExpectingOperator)
+            if (!expect_operator_flag)
                 error_handler_unexpected_token(tok);
 
             /*
@@ -291,13 +293,13 @@ void convert_to_RPN(stack<token> &result, queue<token> &tokens){
             //ponga (push) o1 en el tope de la pila.
             aux.push(tok);
 
-            flagExpectingOperator = false;
-            flagExpectingFunction = true;
-            flagExpectingNumber = true;
+            expect_operator_flag = false;
+            expect_function_flag = true;
+            expect_number_flag = true;
 
         } else if (tok.isFunction()){
 
-            if (!flagExpectingFunction)
+            if (!expect_function_flag)
                 error_handler_unexpected_token(tok);
 
             while ( !aux.isEmpty() && aux.topElement().isOperator() &&
@@ -310,26 +312,26 @@ void convert_to_RPN(stack<token> &result, queue<token> &tokens){
             //ponga (push) o1 en el tope de la pila.
             aux.push(tok);
 
-            flagExpectingOperator = false;
-            flagExpectingFunction = false;
-            flagExpectingNumber = false;
+            expect_operator_flag = false;
+            expect_function_flag = false;
+            expect_number_flag = false;
 
         //Si el token es un paréntesis abierto, entonces póngalo en la pila.
         } else if (tok.isOpenParenthesis()) {
 
             //si esperaba un operador
-            if (flagExpectingOperator)
+            if (expect_operator_flag)
                 error_handler_unexpected_token(tok);
 
             aux.push(tok);
 
-            flagExpectingNumber = false;
+            expect_number_flag = false;
 
         //Si el token es un paréntesis derecho
         } else if (tok.isClosedParenthesis()) {
 
             //esto debe aparecer después de un numero/función, no de un operador
-            if (!flagExpectingOperator)
+            if (!expect_operator_flag)
                 error_handler_unexpected_token(tok);
 
             /*Hasta que el token en el tope de la pila sea un paréntesis
@@ -352,30 +354,30 @@ void convert_to_RPN(stack<token> &result, queue<token> &tokens){
             aux.pop();
 
             /* Ahora esperamos un operador */
-            flagExpectingOperator = true;
-            flagExpectingFunction = true;
-            flagExpectingNumber = false;
+            expect_operator_flag = true;
+            expect_function_flag = true;
+            expect_number_flag = false;
 
         //encuentre un numero
         } else if (tok.isValue() || tok.isSpecial()) {
 
             /* If we're expecting an operator, we're very disappointed. */
-            if (flagExpectingOperator && !flagExpectingNumber)
+            if (expect_operator_flag && !expect_number_flag)
                 error_handler_unexpected_token(tok);
 
             //Si el token es un número, se agrega a la cola de salida
             result.push(tok);
 
-            flagExpectingOperator = true;
-            flagExpectingFunction = false;
-            flagExpectingNumber = false;
+            expect_operator_flag = true;
+            expect_function_flag = false;
+            expect_number_flag = false;
 
         }
     }
 
     //ya se parsearon todos los tokens. Esperamos un operador
     //ya que lo ultimo fue un valor
-    if (!flagExpectingOperator)
+    if (!expect_operator_flag)
         error_handler_unexpected_token(tok);
 
     /*
