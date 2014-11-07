@@ -1,11 +1,9 @@
 #ifndef OPTREE_H
 #define OPTREE_H
 
-// Constantes matemáticas (requeridas: M_PI, M_E)
-#define _USE_MATH_DEFINES
-
 #include <iostream>
 #include <cstdlib>
+#define _USE_MATH_DEFINES // Constantes matemáticas al cargar <cmath>
 #include <cmath>
 #include "complex.h"
 #include "stack.h"

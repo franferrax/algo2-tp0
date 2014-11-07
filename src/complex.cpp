@@ -1,4 +1,5 @@
 #include<iostream>
+#define _USE_MATH_DEFINES // Constantes matemáticas al cargar <cmath>
 #include<cmath>
 #include "complex.h"
 

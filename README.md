@@ -22,6 +22,7 @@ Comenzó con la realización del tp0, pero también alberga el tp1 (aún en curs
 * [Version entregada](https://github.com/franferrax/algo2-tp0/tree/master)
 
 ----------
+
 ## Alumnos
 
 * [Francisco Ferrari Bihurriet](https://github.com/franferrax/)

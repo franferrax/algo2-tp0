@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
+#define _USE_MATH_DEFINES // Constantes matemáticas al cargar <cmath>
 #include <cmath>
 #include <string>
 #include "queue.h"

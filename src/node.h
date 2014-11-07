@@ -10,7 +10,7 @@ template <class T>
 class node {
 
     public:
-        node(const T &, node<T> *);
+        node(const T& v, node<T> *nxt = NULL);
 
     private:
         T _value;
@@ -21,7 +21,7 @@ class node {
 };
 
 template <class T>
-node<T>::node(const T& v, node<T> *nxt = NULL) {
+node<T>::node(const T& v, node<T> *nxt) {
     _value = v;
     _next = nxt;
 }
