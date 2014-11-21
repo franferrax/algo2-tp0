@@ -46,20 +46,17 @@ int main(int argc, char** argv)
     cmdline cmdl(options_);
     cmdl.parse(argc, argv);
 
+
 #ifdef DEBUG
     // Prueba del árbol de operaciones
     complex my_z(5, 5);
 
-    optree *arbolito;
-    arbolito = optree::load_from_stack_RPN(rpn_expr_);
-    arbolito-> asociated_pixel = &my_z;
+    optree arbolito(rpn_expr_, my_z);
 
-    cout << "expression" << my_z << " = " << arbolito->operate() << endl;
+    cout << "expression" << my_z << " = " << arbolito.operate() << endl;
 
     my_z.setReal(0);
-    cout << "expression" << my_z << " = " << arbolito->operate() << endl;
-
-    //delete arbolito;
+    cout << "expression" << my_z << " = " << arbolito.operate() << endl;
 
     exit(1);
 #endif
@@ -86,13 +83,7 @@ int main(int argc, char** argv)
     size_t i, j, row, col;
 
     // Árbol de la operación
-    optree *operation;
-
-    // Cargado del árbol
-    operation = optree::load_from_stack_RPN(rpn_expr_);
-
-    // Fijado del puntero al complejo que recorre los pixels
-    operation->asociated_pixel = &out_plane;
+    optree operation(rpn_expr_, out_plane);
 
     // Recorrido de la imagen y transformación
     for (i = 0; i < h; i++)
@@ -103,7 +94,7 @@ int main(int argc, char** argv)
             get_complex_from_index(out_plane, i, j, h, w);
 
             // Aplicación de la operación
-            in_plane = operation->operate();
+            in_plane = operation.operate();
 
             // Punto en el plano de entrada <-> Pixel en la imagen de entrada
             row = get_row_from_complex(in_plane, h);
@@ -116,9 +107,6 @@ int main(int argc, char** argv)
             }
         }
     }
-
-    // Destrucción del árbol de operaciones
-    delete operation;
 
     // Volcado en el archivo de salida
     *oss_ << out_image;

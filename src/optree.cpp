@@ -1,16 +1,17 @@
 #include "optree.h"
 
 
-// Puntero al complejo que itera los pixels
-complex* optree::asociated_pixel = NULL;
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*|||||||||||||||||||||||||||||||| OptreeNode ||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
 
 /*|/////////////////////////////////|   1)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|////////////////////////| Constructor por defecto |\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-optree::optree()
+optree_node::optree_node()
 {
     this->_t = NODE_UNDEFINED;
-    this->_z       = NULL;
+    this->_c       = NULL;
     this->_un_op   = NULL;
     this->_bin_op  = NULL;
     this->_left    = NULL;
@@ -23,7 +24,7 @@ optree::optree()
 /*|/////////////////////////////////|   2)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////| Constructor a partir de token |\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-optree::optree(const token &tok, optree *father = NULL)
+optree_node::optree_node(const token &tok, optree_node *father = NULL)
 {
     /*
         Los tipos de token son:
@@ -45,7 +46,7 @@ optree::optree(const token &tok, optree *father = NULL)
                                     Tipo: NODE_PIXEL_COMPLEX.
 
                         - j, e, pi: serán asociados a complejos miembros
-                                    estáticos de la clase optree.
+                                    estáticos del array special_complex_.
                                     Tipo: NODE_STATIC_COMPLEX.
     */
 
@@ -70,12 +71,12 @@ optree::optree(const token &tok, optree *father = NULL)
             if (tok.getAsString() == PIXEL_TOKEN)
             {
                 this->_t = NODE_PIXEL_COMPLEX;
-                this->_z = NULL;
+                this->_c = NULL;
             }
             else // Si no es z, se trata de un complejo estático
             {
                 this->_t = NODE_STATIC_COMPLEX;
-                this->_z = &special_complex_[
+                this->_c = &special_complex_[
                            find_in_list(special_tokens_, tok.getAsString()) ];
             }
 
@@ -84,14 +85,14 @@ optree::optree(const token &tok, optree *father = NULL)
         else
         {
            this->_t = NODE_DYNAMIC_COMPLEX;
-           this->_z = new complex(tok.getAsDouble(), 0);
+           this->_c = new complex(tok.getAsDouble(), 0);
         }
     }
 
     // Operaciones
     if (tok.isOperator() || tok.isFunction())
     {
-        this->_z = NULL;
+        this->_c = NULL;
 
         // Operator Token -> Operación binaria
         if (tok.isOperator())
@@ -123,9 +124,9 @@ optree::optree(const token &tok, optree *father = NULL)
 /*|/////////////////////////////////|   3)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|//////////////////////////////| Destructor |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-optree::~optree()
+optree_node::~optree_node()
 {
-    if (this->_t == NODE_DYNAMIC_COMPLEX) delete this->_z;
+    if (this->_t == NODE_DYNAMIC_COMPLEX) delete this->_c;
     if (this->_left != NULL)              delete this->_left;
     if (this->_right != NULL)             delete this->_right;
 }
@@ -135,28 +136,24 @@ optree::~optree()
 /*|/////////////////////////////////|   4)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|//////////////////| Operar, para realizar la operación |\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-const complex optree::operate()
+const complex optree_node::operate(complex *z)
 {
-    if ( this->asociated_pixel == NULL)
-    {
-        cerr << "Internal Error: z for pixel iteration not defined." << endl;
-        exit(2);
-    }
+    // z es un puntero que apunta al complejo asociado al pixel para operar
 
     // Caso base y de corte, operandos.
-    if ( this->_t == NODE_STATIC_COMPLEX  || this->_t == NODE_DYNAMIC_COMPLEX )
-        return *(this->_z);
+    if ( this->_t == NODE_STATIC_COMPLEX || this->_t == NODE_DYNAMIC_COMPLEX )
+        return *(this->_c);
 
     if ( this->_t == NODE_PIXEL_COMPLEX )
-        return *(this->asociated_pixel);
+        return *z;
 
     // Operación binaria (operadores)
     if ( this->_t == NODE_BINARY_OP )
-        return this->_bin_op(this->_left->operate(), this->_right->operate());
+        return this->_bin_op(this->_left->operate(z), this->_right->operate(z));
 
     // Operación unaria (funciones)
     if  (this->_t == NODE_UNARY_OP )
-        return this->_un_op(this->_left->operate());
+        return this->_un_op(this->_left->operate(z));
 
     // Si se llega hasta aquí, el nodo estaba sin definir, error
     cerr << "Internal Error: there are some node, not setted in the optree."
@@ -166,21 +163,24 @@ const complex optree::operate()
 
 
 
-/*|/////////////////////////////////|   5)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-/*|///////////////////| Cargar desde una RPN en una pila |\\\\\\\\\\\\\\\\\\\|*/
-/*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*|||||||||||||||||||||||||||||||||| Optree ||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
 #define is_operation(t) ((t) == NODE_UNARY_OP || (t) == NODE_BINARY_OP)
 
-optree * optree::load_from_stack_RPN(stack<token> &rpn)
+/*|/////////////////////////////////|   2)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*|/////| Constructor desde pila de tokens con RPN + complejo de pixel |\\\\\|*/
+/*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+optree::optree(stack<token> &rpn, complex &z)
 {
-    optree *current, *result;
+    optree_node *current;
 
     // Primer token a la raíz
-    result = new optree(rpn.pop());
+    this->_root = new optree_node(rpn.pop());
 
     // current siempre será una operación, por la construcción del algoritmo,
     // si no lo fuera, la pila ya está vacía.
-    current = result;
+    current = this->_root;
     while (!rpn.isEmpty())
     {
         // Si actual es unario
@@ -190,7 +190,7 @@ optree * optree::load_from_stack_RPN(stack<token> &rpn)
             if (current->_left == NULL)
             {
                 // Token al hijo
-                current->_left = new optree(rpn.pop(), current);
+                current->_left = new optree_node(rpn.pop(), current);
 
                 // Si el token era una operación, bajar
                 if (is_operation(current->_left->_t))
@@ -207,7 +207,7 @@ optree * optree::load_from_stack_RPN(stack<token> &rpn)
             if (current->_right == NULL)
             {
                 // Token a la derecha
-                current->_right = new optree(rpn.pop(), current);
+                current->_right = new optree_node(rpn.pop(), current);
 
                 // Si el token era una operación, bajar por derecha
                 if (is_operation(current->_right->_t))
@@ -220,7 +220,7 @@ optree * optree::load_from_stack_RPN(stack<token> &rpn)
                 if (current->_left == NULL)
                 {
                     // Token a la izquierda
-                    current->_left = new optree(rpn.pop(), current);
+                    current->_left = new optree_node(rpn.pop(), current);
 
                     // Si el token era una operación, bajar por izquierda
                     if (is_operation(current->_left->_t))
@@ -233,5 +233,20 @@ optree * optree::load_from_stack_RPN(stack<token> &rpn)
         }
     }
 
-    return result;
+    // Asociación del complejo para iterar los pixel
+    this->_asoc_pixel = &z;
+
+}
+
+
+
+/*|/////////////////////////////////|   4)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*|//////////////////| Operar, para realizar la operación |\\\\\\\\\\\\\\\\\\|*/
+/*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+const complex optree::operate()
+{
+    // Validaciónes
+    if ( this->_asoc_pixel == NULL || this->_root == NULL ) return complex();
+
+    return _root->operate(this->_asoc_pixel);
 }

@@ -26,39 +26,66 @@ typedef enum
 
 
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
-/*|||||||||||||||||||||||||||||||||| Optree ||||||||||||||||||||||||||||||||||*/
+/*|||||||||||||||||||||||||||||||| OptreeNode ||||||||||||||||||||||||||||||||*/
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
-
-class optree {
+class optree_node {
 
     node_type             _t;  // Tipo de nodo
-    complex const        *_z;  // Puntero al complejo para evaluar
+    complex const        *_c;  // Puntero al complejo para evaluar
 
     operator_t       _bin_op;  // Puntero a la operación binaria
     function_t        _un_op;  // Puntero a la operación unaria
 
-    optree      *_left;  // Subárbol izquierdo (o hijo en operaciones unarias)
-    optree      *_right; // Subárbol derecho
-    optree      *_up;    // Padre
+    optree_node *_left;  // Subárbol izquierdo (o hijo en operaciones unarias)
+    optree_node *_right; // Subárbol derecho
+    optree_node *_up;    // Padre
 
 public:
     // 1) Constructor por defecto
-    optree();
+    optree_node();
 
     // 2) Constructor a partir de token
-    optree(const token &, optree *);
+    optree_node(const token &, optree_node *);
 
     // 3) Destructor
-    ~optree();
+    ~optree_node();
+
+    // 4) Operar, para realizar la operación
+    const complex operate(complex *);
+
+    friend class optree;
+
+private:
+    // TODO: constructor por copia
+    optree_node(const optree_node &);
+};
+
+
+
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+/*|||||||||||||||||||||||||||||||||| Optree ||||||||||||||||||||||||||||||||||*/
+/*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+class optree {
+
+    optree_node *_root;       // Raíz del árbol
+    complex     *_asoc_pixel; // Puntero al complejo asociado al pixel
+
+public:
+    // 1) Constructor por defecto
+    optree() { _root = NULL; _asoc_pixel = NULL; }
+
+    // 2) Constructor desde pila de tokens con RPN + complejo de pixel
+    optree(stack<token> &, complex &);
+
+    // 3) Destructor
+    ~optree() { delete this->_root; }
 
     // 4) Operar, para realizar la operación
     const complex operate();
 
-    // 5) Cargar desde una RPN en una pila
-    static optree * load_from_stack_RPN(stack<token> &);
-
-    // Puntero al complejo asociado al pixel
-    static complex *asociated_pixel;
+private:
+    // TODO: constructor por copia
+    optree(const optree &);
 };
 
 
