@@ -49,16 +49,13 @@ int main(int argc, char** argv)
 
 #ifdef DEBUG
     // Prueba del árbol de operaciones
-    complex my_z(5, 5);
+    complex test_z(5, 5);
+    optree test_tree(rpn_expr_, test_z);
 
-    optree arbolito(rpn_expr_, my_z);
+    cerr << "expression" << test_z << " = " << test_tree.operate() << endl;
 
-    cout << "expression" << my_z << " = " << arbolito.operate() << endl;
-
-    my_z.setReal(0);
-    cout << "expression" << my_z << " = " << arbolito.operate() << endl;
-
-    exit(1);
+    test_z.setReal(0);
+    cerr << "expression" << test_z << " = " << test_tree.operate() << endl;
 #endif
 
 
@@ -97,8 +94,8 @@ int main(int argc, char** argv)
             in_plane = operation.operate();
 
             // Punto en el plano de entrada <-> Pixel en la imagen de entrada
-            row = get_row_from_complex(in_plane, h);
-            col = get_col_from_complex(in_plane, w);
+            get_row_from_complex(row, in_plane, h);
+            get_col_from_complex(col, in_plane, w);
 
             // Si no se cayó fuera de la imagen, se copia
             if (row < h && col < w)

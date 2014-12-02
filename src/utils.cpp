@@ -147,13 +147,12 @@ void opt_help(const string &arg)
 /*|/////////////////////////////////|   6)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|///////////////| Obtener complejo asociado a los índices |\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-void get_complex_from_index(complex &z, size_t i, size_t j,
-                         size_t h, size_t w)
+void get_complex_from_index(complex &z, size_t i, size_t j, size_t h, size_t w)
 {
     if ( h && w && i < h && j < w)
     {
-        z.setReal( map_w_ * ( ((double)j + 0.5) / (double)w  -  0.5 ) );
-        z.setImag( map_h_ * ( 0.5  -  ((double)i + 0.5) / (double)h ) );
+        z.setReal( map_w_ * ( (j + 0.5)/w  -  0.5 ) );
+        z.setImag( map_h_ * ( 0.5  -  (i + 0.5)/h ) );
         z += map_c_;
     }
 }
@@ -163,9 +162,9 @@ void get_complex_from_index(complex &z, size_t i, size_t j,
 /*|/////////////////////////////////|   7)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|///////////| Obtener la fila asociada al complejo ( [i][ ] ) |\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-size_t get_row_from_complex(const complex &z, size_t h)
+void get_row_from_complex(size_t &row, const complex &z, size_t h)
 {
-    return h * ( 0.5 - (z.getImag()-map_c_.getImag()) / map_h_ );
+    row = h * ( 0.5 - (z.getImag()-map_c_.getImag())/map_h_ );
 }
 
 
@@ -173,7 +172,7 @@ size_t get_row_from_complex(const complex &z, size_t h)
 /*|/////////////////////////////////|   8)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|//////////| Obtener la columna asociada al complejo ( [ ][j] ) \\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-size_t get_col_from_complex(const complex &z, size_t w)
+void get_col_from_complex(size_t &col, const complex &z, size_t w)
 {
-    return w * ( 0.5 + (z.getReal()-map_c_.getReal()) / map_w_ );
+    col = w * ( 0.5 + (z.getReal()-map_c_.getReal()) / map_w_ );
 }
