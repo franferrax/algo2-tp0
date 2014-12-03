@@ -8,6 +8,12 @@ CC = g++
 LFLAGS = -pedantic -Wall
 # Flags para compilación:
 CFLAGS = -ansi -pedantic-errors -Wall -O3
+# Flags para debugging:
+DFLAGS = -g -DDEBUG
+# Centinela de debugging:
+DEBUG_CENTINEL = .last_debug
+DEBUG_CENTINEL_CONTENT = "This file indicates that the last build was made with\
+the \'debug\' option."
 # Nombre de salida del proyecto:
 OUT = tp1
 # Directorio de archivos fuente:
@@ -23,7 +29,9 @@ INSTALL_DIR = /usr/bin
 # ||||||||||||||||||||||||| Objetivos y dependencias ||||||||||||||||||||||||| #
 # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////// #
 
-    # -------------------------- Códigos objeto -------------------------- #
+
+# |----------------------------| Códigos objeto |----------------------------| #
+
 OBJECTS = $(addprefix $(BIN_DIR)/, \
     PGMimage.o     \
     complex.o      \
@@ -35,17 +43,34 @@ OBJECTS = $(addprefix $(BIN_DIR)/, \
 )
 FULL_OUT = $(BIN_DIR)/$(OUT)
 
-    # ---------------------- Reglas de construcción ---------------------- #
+
+# |------------------------| Reglas de construcción |------------------------| #
+
+# Objetivo de fantasía por defecto, para manejar la opción debug
+.PHONY: $(OUT)
+ifeq (,$(wildcard $(BIN_DIR)/$(DEBUG_CENTINEL)))
+# Si no existe el centinela de debug, se procede normalmente
+$(OUT): $(FULL_OUT)
+else
+# Si existe, es necesario limpiar (con lo que también se eliminará el mismo)
+$(OUT): clean $(FULL_OUT)
+endif
+
+# Construcción del ejecutable de salida
 $(FULL_OUT): $(OBJECTS) | $(BIN_DIR)
-	$(CC) $(LFLAGS) $(OBJECTS) -o $(FULL_OUT) $(DFLAGS)
+	$(CC) $(LFLAGS) $(OBJECTS) -o $(FULL_OUT)
 
+# Construcción de los archivos objeto
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CC) -c $(CFLAGS) $< -o $@ $(DFLAGS)
+	$(CC) -c $(CFLAGS) $< -o $@
 
+# Creación del directorio de binarios
 $(BIN_DIR):
 	mkdir $(BIN_DIR)
 
-    # -------------------------- Dependencias ---------------------------- #
+
+# |-----------------------------| Dependencias |-----------------------------| #
+
 $(BIN_DIR)/PGMimage.o: $(addprefix $(SRC_DIR)/, \
     PGMimage.cpp   \
     PGMimage.h     \
@@ -110,33 +135,45 @@ $(BIN_DIR)/main.o: $(addprefix $(SRC_DIR)/, \
 # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////// #
 .PHONY: debug clean objclean deltemps install all remove purge
 
-    # ----------- Debug (limpiar y compilar con flag de debug) ----------- #
-debug:
-	@ rm -rf $(BIN_DIR)/*.o
-	@ make --no-print-directory DFLAGS="-g -DDEBUG"
 
-    # -------------------------- Limpiar (todo) -------------------------- #
+# |------------------| Debug (compilar con flags de debug) |-----------------| #
+
+debug: CFLAGS += $(DFLAGS)
+debug: LFLAGS += $(DFLAGS)
+ifeq (,$(wildcard $(BIN_DIR)/$(DEBUG_CENTINEL)))
+# Si no existe el centinela de debug, hay que limpiar y crearlo
+debug: clean $(FULL_OUT)
+	@ echo "$(DEBUG_CENTINEL_CONTENT)" > $(BIN_DIR)/$(DEBUG_CENTINEL)
+else
+# Si existe, solo actualizar si es necesario
+debug: $(FULL_OUT)
+endif
+
+
+# |----------------------------| Limpiar (todo) |----------------------------| #
+
 clean:
 	rm -rf $(BIN_DIR)
 
-    # ---------------------- Limpiar códigos objeto ---------------------- #
+
+# |------------------------| Limpiar códigos objeto |------------------------| #
+
 objclean:
 	rm -f $(BIN_DIR)/*.o
 
-    # ------------- Construir y eliminar archivos temporales ------------- #
+
+# |---------------| Construir y eliminar archivos temporales |---------------| #
+
 deltemps: $(FULL_OUT) objclean
 
-    # ------------------------------ Instalar ---------------------------- #
+
+# |-------------------------------| Instalar |-------------------------------| #
+
 install: $(FULL_OUT)
-	@ cp $(FULL_OUT) "$(INSTALL_DIR)"
-	@ echo "'$(OUT)' --> Installed in: $(INSTALL_DIR)"
+	cp $(FULL_OUT) "$(INSTALL_DIR)"
 
-    # --------------------- Todo (instalar y limpiar) -------------------- #
-all: install clean
 
-    # ---------------------------- Desinstalar --------------------------- #
-remove:
+# |------------------------------| Desinstalar |-----------------------------| #
+
+uninstall:
 	rm -f "$(INSTALL_DIR)/$(OUT)"
-
-    # ------------------ Purgar (desinstalar y limpiar) ------------------ #
-purge: remove clean
