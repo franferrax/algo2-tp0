@@ -34,6 +34,13 @@ complex      map_c_;            // Centro de la región de mapeo
 stack<token> rpn_expr_;         // Expresión convertida a RPN
 
 
+// Macro de función para imprimir mensajes de debugging
+#ifdef DEBUG
+#define DEBUG_MSG(m) (cerr << m << "\n")
+#else
+#define DEBUG_MSG(m)
+#endif
+
 
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
 /*||||||||||||||||||||||||||||||||||| Main |||||||||||||||||||||||||||||||||||*/
@@ -46,18 +53,7 @@ int main(int argc, char** argv)
     cmdline cmdl(options_);
     cmdl.parse(argc, argv);
 
-
-#ifdef DEBUG
-    // Prueba del árbol de operaciones
-    complex test_z(5, 5);
-    optree test_tree(rpn_expr_, test_z);
-
-    cerr << "expression" << test_z << " = " << test_tree.operate() << endl;
-
-    test_z.setReal(0);
-    cerr << "expression" << test_z << " = " << test_tree.operate() << endl;
-#endif
-
+    DEBUG_MSG("Argumentos validados, apertura de archivos, conversión a RPN.");
 
     // Lectura del archivo de entrada
     PGMimage in_image;
@@ -69,6 +65,8 @@ int main(int argc, char** argv)
     // Si nada ha fallado, se puede cerrar el archivo
     if (ifs_) ifs_.close();
 
+    DEBUG_MSG("Archivo de entrada cargado.");
+
     // Creación de una nueva imagen con las mismas dimensiones
     size_t h = in_image.getHeight();
     size_t w = in_image.getWidth();
@@ -79,8 +77,12 @@ int main(int argc, char** argv)
     complex in_plane, out_plane;
     size_t i, j, row, col;
 
+    DEBUG_MSG("Imagen de salida y variables auxiliares creadas.");
+
     // Árbol de la operación
     optree operation(rpn_expr_, out_plane);
+
+    DEBUG_MSG("Árbol de la operación generado.");
 
     // Recorrido de la imagen y transformación
     for (i = 0; i < h; i++)
@@ -105,9 +107,13 @@ int main(int argc, char** argv)
         }
     }
 
+    DEBUG_MSG("Imagen de salida escrita.");
+
     // Volcado en el archivo de salida
     *oss_ << out_image;
     if (ofs_) ofs_.close();
+
+    DEBUG_MSG("Archivo de salida guardado y cerrado.");
 
     return 0;
 }
