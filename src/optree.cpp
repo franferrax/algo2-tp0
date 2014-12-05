@@ -181,9 +181,17 @@ bool optree_node::simplify()
     if (this->_right == NULL)
         pixel_dependent = this->_left->simplify();
 
-    // Si tiene ambos hijos (op binaria), con que uno dependa de z, suficiente
+    /*
+       Si tiene ambos hijos (op binaria), con que uno dependa de z, suficiente.
+       Pero hay que visitar ambos hijos con simplify(). El operador || no evalúa
+       si ya encontró true a izquierda, por eso se utilizan dos líneas, ubicando
+       en la segunda, el llamado a simplify() a la izquierda.
+    */
     else
-        pixel_dependent = this->_left->simplify() || this->_right->simplify();
+    {
+        pixel_dependent = this->_left->simplify();
+        pixel_dependent = this->_right->simplify() || pixel_dependent;
+    }
 
     // Si no es pixel dependiente, como no es hoja (caso base), se simplifica
     if (!pixel_dependent)
@@ -209,6 +217,9 @@ bool optree_node::simplify()
             delete this->_right;
             this->_right = NULL;
         }
+#ifdef DEBUG
+        cerr << "    Construyendo árbol: simplificación realizada.\n";
+#endif
     }
 
     return pixel_dependent;
