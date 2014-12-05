@@ -171,20 +171,15 @@ const complex optree_node::operate(complex *z) const
 // NOTA: devuelve true si el subárbol depende de z
 bool optree_node::simplify()
 {
-    bool pixel_dependent = false;
+    bool pixel_dependent;
 
-    // Caso base: no tiene hijos, entonces depende de él, si es z u otra cosa
+    // Caso base: hoja, entonces depende de él, si es z u otra cosa
     if (this->_left == NULL && this->_right == NULL)
-    {
-        if (this->_t == NODE_PIXEL_COMPLEX)
-            pixel_dependent = true;
-
-        return pixel_dependent;
-    }
+        return this->_t == NODE_PIXEL_COMPLEX;
 
     // Si tiene único hijo (está a la izquierda, op unaria), depende de éste
     if (this->_right == NULL)
-        pixel_dependent = this->_right->simplify();
+        pixel_dependent = this->_left->simplify();
 
     // Si tiene ambos hijos (op binaria), con que uno dependa de z, suficiente
     else
@@ -194,20 +189,21 @@ bool optree_node::simplify()
     if (!pixel_dependent)
     {
         /*
-           Resultado, no depende de z, por eso no molesta pasar NULL a operate.
-           Como el nodo actual no es hoja, es una operación, por lo tanto _c
-           está libre y en NULL.
+           El resultado no depende de z, por eso no hay problema con pasar NULL
+           a operate(). Además, como el nodo actual no es hoja, es una
+           operación, por lo tanto _c está libre (en NULL).
         */
         this->_c = new complex(this->operate(NULL));
 
-        // Se cambia el tipo
+        // Se cambia el tipo del nodo subárbol, ahora convertido en hoja
         this->_t = NODE_DYNAMIC_COMPLEX;
         this->_un_op  = NULL;
         this->_bin_op = NULL;
 
-        // Se destruyen los hijos (o el hijo)
+        // Se destruye el hijo izquierdo (tiene que existir)
         delete this->_left;
         this->_left = NULL;
+        // Si tiene, se destruye el hijo derecho
         if (this->_right != NULL)
         {
             delete this->_right;
