@@ -30,15 +30,21 @@ typedef enum
 /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
 class optree_node {
 
-    node_type             _t;  // Tipo de nodo
-    complex const        *_c;  // Puntero al complejo para evaluar
+    node_type     _t;      // Tipo de nodo
+    complex const *_c;     // Puntero al complejo para evaluar
+    operator_t    _bin_op; // Puntero a la operación binaria
+    function_t    _un_op;  // Puntero a la operación unaria
+    optree_node   *_left;  // Subárbol izquierdo (o hijo en operaciones unarias)
+    optree_node   *_right; // Subárbol derecho
+    optree_node   *_up;    // Padre
 
-    operator_t       _bin_op;  // Puntero a la operación binaria
-    function_t        _un_op;  // Puntero a la operación unaria
 
-    optree_node *_left;  // Subárbol izquierdo (o hijo en operaciones unarias)
-    optree_node *_right; // Subárbol derecho
-    optree_node *_up;    // Padre
+    ///////////////////////// Utilidades internas //////////////////////////
+
+    // Simplificar el sub-árbol eliminando las expresiones independientes de z
+    // NOTA: devuelve true si el subárbol depende de z
+    bool simplify();
+
 
 public:
     // 1) Constructor por defecto
@@ -51,7 +57,7 @@ public:
     ~optree_node();
 
     // 4) Operar, para realizar la operación
-    const complex operate(complex *);
+    const complex operate(complex *) const;
 
     friend class optree;
 
@@ -59,6 +65,7 @@ private:
     // TODO: constructor por copia
     optree_node(const optree_node &);
 };
+
 
 
 
@@ -81,7 +88,7 @@ public:
     ~optree() { delete this->_root; }
 
     // 4) Operar, para realizar la operación
-    const complex operate();
+    const complex operate() const;
 
 private:
     // TODO: constructor por copia

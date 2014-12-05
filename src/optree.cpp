@@ -136,7 +136,7 @@ optree_node::~optree_node()
 /*|/////////////////////////////////|   4)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|//////////////////| Operar, para realizar la operación |\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-const complex optree_node::operate(complex *z)
+const complex optree_node::operate(complex *z) const
 {
     // z es un puntero que apunta al complejo asociado al pixel para operar
 
@@ -160,6 +160,64 @@ const complex optree_node::operate(complex *z)
          << endl;
     exit(2);
 }
+
+
+
+/*|/////////////////////////////////|   *)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*|/////////////////////////| Utilidades internas |\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+/*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
+
+// Simplificar el sub-árbol eliminando las expresiones independientes de z
+// NOTA: devuelve true si el subárbol depende de z
+bool optree_node::simplify()
+{
+    bool pixel_dependent = false;
+
+    // Caso base: no tiene hijos, entonces depende de él, si es z u otra cosa
+    if (this->_left == NULL && this->_right == NULL)
+    {
+        if (this->_t == NODE_PIXEL_COMPLEX)
+            pixel_dependent = true;
+
+        return pixel_dependent;
+    }
+
+    // Si tiene único hijo (está a la izquierda, op unaria), depende de éste
+    if (this->_right == NULL)
+        pixel_dependent = this->_right->simplify();
+
+    // Si tiene ambos hijos (op binaria), con que uno dependa de z, suficiente
+    else
+        pixel_dependent = this->_left->simplify() || this->_right->simplify();
+
+    // Si no es pixel dependiente, como no es hoja (caso base), se simplifica
+    if (!pixel_dependent)
+    {
+        /*
+           Resultado, no depende de z, por eso no molesta pasar NULL a operate.
+           Como el nodo actual no es hoja, es una operación, por lo tanto _c
+           está libre y en NULL.
+        */
+        this->_c = new complex(this->operate(NULL));
+
+        // Se cambia el tipo
+        this->_t = NODE_DYNAMIC_COMPLEX;
+        this->_un_op  = NULL;
+        this->_bin_op = NULL;
+
+        // Se destruyen los hijos (o el hijo)
+        delete this->_left;
+        this->_left = NULL;
+        if (this->_right != NULL)
+        {
+            delete this->_right;
+            this->_right = NULL;
+        }
+    }
+
+    return pixel_dependent;
+}
+
 
 
 
@@ -236,6 +294,8 @@ optree::optree(stack<token> &rpn, complex &z)
     // Asociación del complejo para iterar los pixel
     this->_asoc_pixel = &z;
 
+    // Simplificación del árbol, eliminando expresiones 'estáticas'
+    this->_root->simplify();
 }
 
 
@@ -243,7 +303,7 @@ optree::optree(stack<token> &rpn, complex &z)
 /*|/////////////////////////////////|   4)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|//////////////////| Operar, para realizar la operación |\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-const complex optree::operate()
+const complex optree::operate() const
 {
     // Validaciónes
     if ( this->_asoc_pixel == NULL || this->_root == NULL ) return complex();
