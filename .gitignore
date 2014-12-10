@@ -5,9 +5,6 @@ bin/
 informe/img/
 test/9097x6500.pgm
 
-# Informe en PDF, no es necesario que esté en el repositorio
-informe/informe.pdf
-
 # Archivos de los editores
 nbproject/
 doc/
