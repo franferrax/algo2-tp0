@@ -156,7 +156,7 @@ const string special_tokens_[] =
     ""
 };
 
-// Complejos asociados a tokens especiales, excepto z, el orden importa
+// Complejos asociados a tokens especiales (excepto z), el orden importa
 const complex special_complex_[] =
 {
     complex(0, 1),       // j

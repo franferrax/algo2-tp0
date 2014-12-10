@@ -136,7 +136,7 @@ optree_node::~optree_node()
 /*|/////////////////////////////////|   4)  |\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
 /*|//////////////////| Operar, para realizar la operación |\\\\\\\\\\\\\\\\\\|*/
 /*|/////////////////////////////////////|\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\|*/
-const complex optree_node::operate(complex *z) const
+const complex optree_node::operate(const complex *z) const
 {
     // z es un puntero que apunta al complejo asociado al pixel para operar
 

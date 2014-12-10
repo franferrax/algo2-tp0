@@ -57,7 +57,7 @@ public:
     ~optree_node();
 
     // 4) Operar, para realizar la operación
-    const complex operate(complex *) const;
+    const complex operate(const complex *) const;
 
     friend class optree;
 
