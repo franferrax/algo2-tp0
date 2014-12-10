@@ -133,11 +133,11 @@ $(BIN_DIR)/main.o: $(addprefix $(SRC_DIR)/, \
 # //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ #
 # ||||||||||||||||||||||||||||| Utilidades extras |||||||||||||||||||||||||||| #
 # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////// #
-.PHONY: debug clean objclean deltemps install all remove purge
 
 
 # |------------------| Debug (compilar con flags de debug) |-----------------| #
 
+.PHONY: debug
 debug: CFLAGS += $(DFLAGS)
 debug: LFLAGS += $(DFLAGS)
 ifeq (,$(wildcard $(BIN_DIR)/$(DEBUG_CENTINEL)))
@@ -152,28 +152,33 @@ endif
 
 # |----------------------------| Limpiar (todo) |----------------------------| #
 
+.PHONY: clean
 clean:
 	rm -rf $(BIN_DIR)
 
 
 # |------------------------| Limpiar códigos objeto |------------------------| #
 
+.PHONY: objclean
 objclean:
 	rm -f $(BIN_DIR)/*.o
 
 
 # |---------------| Construir y eliminar archivos temporales |---------------| #
 
+.PHONY: deltemps
 deltemps: $(FULL_OUT) objclean
 
 
 # |-------------------------------| Instalar |-------------------------------| #
 
+.PHONY: install
 install: $(FULL_OUT)
 	cp $(FULL_OUT) "$(INSTALL_DIR)"
 
 
 # |------------------------------| Desinstalar |-----------------------------| #
 
+.PHONY: uninstall
 uninstall:
 	rm -f "$(INSTALL_DIR)/$(OUT)"
