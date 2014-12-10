@@ -1,4 +1,4 @@
-# algo2-tp0/tp1
+# algo2-tp0(tp1)
 
 Repositorio personal para la realización de trabajos prácticos de la materia
 [75.04 - Algoritmos y Programación II](http://materias.fi.uba.ar/7504E/), de la
@@ -7,7 +7,7 @@ carrera [Ingeniería Electrónica](http://www.fi.uba.ar/es/node/201) de la
 
 Comenzó con la realización del tp0, pero también alberga el tp1 (aún en curso).
 
-----------
+--------------------------------------------------------------------------------
 
 ## Trabajos Prácticos
 
@@ -18,10 +18,10 @@ Comenzó con la realización del tp0, pero también alberga el tp1 (aún en curs
 
 ### tp1
 
-* [Enunciado](https://github.com/franferrax/algo2-tp0/blob/master/informe/enunciado.pdf)
-* [Version entregada](https://github.com/franferrax/algo2-tp0/tree/master)
+* [Enunciado](https://github.com/franferrax/algo2-tp0/blob/tp1/informe/enunciado.pdf)
+* [Version entregada](https://github.com/franferrax/algo2-tp0/tree/tp1)
 
-----------
+--------------------------------------------------------------------------------
 
 ## Alumnos
 
