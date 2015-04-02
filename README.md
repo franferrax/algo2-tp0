@@ -5,7 +5,7 @@ Repositorio personal para la realización de trabajos prácticos de la materia
 carrera [Ingeniería Electrónica](http://www.fi.uba.ar/es/node/201) de la
 [Universidad de Buenos Aires](http://www.uba.ar/).
 
-Comenzó con la realización del tp0, pero también alberga el tp1 (aún en curso).
+Comenzó con la realización del tp0, pero también alberga el tp1.
 
 --------------------------------------------------------------------------------
 
